@@ -1,11 +1,21 @@
 {
-  "name": "truffle-project",
-  "version": "0.1.0",
-  "description": "Truffle project with SimpleStorage contract",
-  "scripts": {
-    "test": "truffle test"
-  },
-  "dependencies": {
-    "@truffle/hdwallet-provider": "^2.1.7"
-  }
+	"name": "sol-truffle-lotterex",
+	"scripts": {
+		"generate": "pnpx typechain --target=truffle-v5 \"../web-next-lotterex/src/contracts/*.json\"",
+		"test": "truffle test"
+	},
+	"dependencies": {
+		"@openzeppelin/contracts": "^4.9.0",
+		"@truffle/hdwallet-provider": "^2.1.7",
+		"@typechain/truffle-v5": "^8.0.3",
+		"truffle": "^5.9.2",
+		"typechain": "^8.2.0"
+	},
+	"devDependencies": {
+		"@types/chai": "^4.3.5",
+		"@types/mocha": "^10.0.1",
+		"@types/node": "latest",
+		"ts-node": "latest",
+		"typescript": "latest"
+	}
 }
