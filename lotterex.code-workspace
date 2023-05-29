@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "sol-truffle-lotterex"
+		},
+		{
+			"path": "web-next-lotterex"
+		},
+		{
+			"path": "."
+		}
+    ]
+}
