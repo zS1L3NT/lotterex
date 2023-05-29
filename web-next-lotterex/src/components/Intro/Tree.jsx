@@ -2,7 +2,7 @@ function Tree() {
   return (
     <code>
       {`.\n`}
-      {`├── client`}
+      {`├── web-next-lotterex`}
       <span className="primary-color">
         {`   # React project (create-react-app)\n`}
       </span>

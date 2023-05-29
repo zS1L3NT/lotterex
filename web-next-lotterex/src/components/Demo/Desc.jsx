@@ -2,7 +2,7 @@ function Desc() {
   return (
     <>
       <p>
-        Take a look at <span className="code">client/src/contexts/EthContext</span>.
+        Take a look at <span className="code">web-next-lotterex/src/contexts/EthContext</span>.
         This context maintains a global state and provides web3.js functionalities
         to the rest of the app.
       </p>
