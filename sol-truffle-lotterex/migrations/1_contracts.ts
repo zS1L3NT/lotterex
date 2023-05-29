@@ -1,5 +1,3 @@
-module.exports = (artifacts: Truffle.Artifacts) => {
-	return async (deployer: Truffle.Deployer, network: string, accounts: string[]) => {
-		deployer.deploy(artifacts.require("Lotterex"))
-	}
+module.exports = (deployer: Truffle.Deployer) => {
+	deployer.deploy(artifacts.require("Lotterex"))
 }
