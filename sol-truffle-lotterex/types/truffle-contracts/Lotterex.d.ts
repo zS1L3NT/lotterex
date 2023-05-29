@@ -14,8 +14,40 @@ type AllEvents = never;
 export interface LotterexInstance extends Truffle.ContractInstance {
   manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
+  players(
+    arg0: number | BN | string,
+    txDetails?: Truffle.TransactionDetails
+  ): Promise<string>;
+
+  getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+  pickWinner: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse<AllEvents>
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
   methods: {
     manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+    players(
+      arg0: number | BN | string,
+      txDetails?: Truffle.TransactionDetails
+    ): Promise<string>;
+
+    getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+    pickWinner: {
+      (txDetails?: Truffle.TransactionDetails): Promise<
+        Truffle.TransactionResponse<AllEvents>
+      >;
+      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+      sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+      estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+    };
   };
 
   getPastEvents(event: string): Promise<EventData[]>;

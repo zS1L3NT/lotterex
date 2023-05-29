@@ -12,10 +12,15 @@
 		"typechain": "^8.2.0"
 	},
 	"devDependencies": {
+		"@types/bn.js": "^5.1.1",
 		"@types/chai": "^4.3.5",
 		"@types/mocha": "^10.0.1",
 		"@types/node": "latest",
 		"ts-node": "latest",
-		"typescript": "latest"
+		"typescript": "latest",
+		"web3": "^1.10.0",
+		"web3-core": "^1.10.0",
+		"web3-eth-contract": "^1.10.0",
+		"web3-utils": "^1.10.0"
 	}
 }
