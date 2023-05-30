@@ -20,6 +20,12 @@ contract Lotterex {
 		players.push(msg.sender);
 	}
 
+	function getPlayers() external view returns (address[] memory) {
+		require(msg.sender == manager, "Only the manager can call this function");
+
+		return players;
+	}
+
 	function getBalance() external view returns (uint256) {
 		require(msg.sender == manager, "Only the manager can call this function");
 
