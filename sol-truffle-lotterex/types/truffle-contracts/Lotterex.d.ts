@@ -6,7 +6,10 @@ import BN from "bn.js";
 import { EventData, PastEventOptions } from "web3-eth-contract";
 
 export interface LotterexContract extends Truffle.Contract<LotterexInstance> {
-  "new"(meta?: Truffle.TransactionDetails): Promise<LotterexInstance>;
+  "new"(
+    _name: string,
+    meta?: Truffle.TransactionDetails
+  ): Promise<LotterexInstance>;
 }
 
 type AllEvents = never;
@@ -14,10 +17,7 @@ type AllEvents = never;
 export interface LotterexInstance extends Truffle.ContractInstance {
   manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
-  players(
-    arg0: number | BN | string,
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<string>;
+  name(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
   getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
@@ -46,10 +46,7 @@ export interface LotterexInstance extends Truffle.ContractInstance {
   methods: {
     manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
-    players(
-      arg0: number | BN | string,
-      txDetails?: Truffle.TransactionDetails
-    ): Promise<string>;
+    name(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
     getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
