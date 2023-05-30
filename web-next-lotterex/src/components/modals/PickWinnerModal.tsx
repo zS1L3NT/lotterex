@@ -47,8 +47,6 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 							.then((b: string) => +web3.utils.fromWei(b))
 							.then(setBalance)
 						lottery.methods.getPlayers().call({ from: accountId }).then(setPlayers)
-					} else {
-						console.warn({ managerId, accountId })
 					}
 				})
 		}

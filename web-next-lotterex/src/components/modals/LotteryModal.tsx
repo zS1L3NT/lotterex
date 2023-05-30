@@ -8,12 +8,12 @@ import { useDisclosure } from "@mantine/hooks"
 
 import WalletContext from "../../contexts/WalletContext"
 
-export type EnterLotteryModalRef = {
+export type LotteryModalRef = {
 	open: (lottery: Contract) => void
 	close: () => void
 }
 
-export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterLotteryModalRef>) {
+export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModalRef>) {
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
@@ -45,11 +45,23 @@ export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterL
 		if (web3 && accountId && lottery) {
 			lottery.methods
 				.enter()
-				.send({
-					from: accountId,
-					value: web3.utils.toWei(cost.toString(), "ether")
+				.send({ from: accountId, value: web3.utils.toWei(cost.toString(), "ether") })
+				.then(() => {
+					setHasEntered(true)
+					close()
 				})
-				.then(console.log)
+		}
+	}
+
+	const handleLeaveLottery = () => {
+		if (web3 && accountId && lottery) {
+			lottery.methods
+				.leave()
+				.send({ from: accountId })
+				.then(() => {
+					setHasEntered(false)
+					close()
+				})
 		}
 	}
 
@@ -58,7 +70,7 @@ export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterL
 			opened={opened}
 			onClose={close}
 			centered
-			title="Enter Lottery">
+			title="Lottery">
 			<Stack>
 				<Box>
 					<Text>Name:</Text>
@@ -87,7 +99,8 @@ export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterL
 				) : (
 					<Button
 						variant="light"
-						color="red">
+						color="red"
+						onClick={handleLeaveLottery}>
 						Leave Lottery
 					</Button>
 				)}

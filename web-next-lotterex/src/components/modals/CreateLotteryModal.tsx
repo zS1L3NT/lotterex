@@ -24,7 +24,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 
 	const handleCreate = async () => {
 		if (web3 && accountId) {
-			await new web3.eth.Contract(LotterexArtifact.abi as any)
+			new web3.eth.Contract(LotterexArtifact.abi as any)
 				.deploy({
 					data: LotterexArtifact.bytecode,
 					arguments: [name]
@@ -34,11 +34,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 					value: 0,
 					gas: 1_500_000
 				})
-				.once("transactionHash", console.log)
-				.once("sent", console.log)
-				.once("confirmation", console.log)
 				.once("receipt", receipt => {
-					console.log(receipt)
 					addLotteryId(receipt.contractAddress!)
 					close()
 				})

@@ -6,7 +6,7 @@ import { IconPlus } from "@tabler/icons-react"
 
 import Lottery from "../components/Lottery"
 import CreateLotteryModal, { CreateLotteryModalRef } from "../components/modals/CreateLotteryModal"
-import EnterLotteryModal, { EnterLotteryModalRef } from "../components/modals/EnterLotteryModal"
+import LotteryModal, { LotteryModalRef } from "../components/modals/LotteryModal"
 import PickWinnerModal, { PickWinnerModalRef } from "../components/modals/PickWinnerModal"
 import LotteriesContext from "../contexts/LotteriesContext"
 
@@ -17,7 +17,7 @@ export default function Index() {
 	const isBelowXs = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
 	const createLotteryModalRef = useRef<CreateLotteryModalRef>(null)
-	const enterLotteryModalRef = useRef<EnterLotteryModalRef>(null)
+	const lotteryModalRef = useRef<LotteryModalRef>(null)
 	const pickWinnerModalRef = useRef<PickWinnerModalRef>(null)
 
 	return (
@@ -42,13 +42,13 @@ export default function Index() {
 						key={lottery.options.address}
 						lottery={lottery}
 						onPickWinner={() => pickWinnerModalRef.current?.open(lottery)}
-						onEnterLottery={() => enterLotteryModalRef.current?.open(lottery)}
+						onEnterLottery={() => lotteryModalRef.current?.open(lottery)}
 					/>
 				))}
 			</Stack>
 
 			<CreateLotteryModal ref={createLotteryModalRef} />
-			<EnterLotteryModal ref={enterLotteryModalRef} />
+			<LotteryModal ref={lotteryModalRef} />
 			<PickWinnerModal ref={pickWinnerModalRef} />
 		</>
 	)
