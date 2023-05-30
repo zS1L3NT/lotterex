@@ -1,9 +1,9 @@
 import { ForwardedRef, forwardRef, useContext, useImperativeHandle, useState } from "react"
-import { useLocalstorageState } from "rooks"
 
 import { Alert, Button, Modal, Stack, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 
+import LotteriesContext from "../../contexts/LotteriesContext"
 import WalletContext from "../../contexts/WalletContext"
 import LotterexArtifact from "../../contracts/Lotterex.json"
 
@@ -13,34 +13,33 @@ export type CreateLotteryModalRef = {
 }
 
 export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<CreateLotteryModalRef>) {
-	const { web3, account, contract } = useContext(WalletContext)
+	const { addLotteryId } = useContext(LotteriesContext)
+	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [name, setName] = useState("")
 	const [error, setError] = useState<Error | null>(null)
-	const [, setLotteries] = useLocalstorageState<Lottery[]>("lotteries", [])
 
 	useImperativeHandle(ref, () => ({ open, close }))
 
 	const handleCreate = async () => {
-		if (web3 && account && contract) {
-			const tx = await contract.deploy({ data: LotterexArtifact.bytecode })
-
-			await tx
-				.send({
-					from: account,
-					value: 0,
-					gas: 1_000_000
+		if (web3 && accountId) {
+			await new web3.eth.Contract(LotterexArtifact.abi as any)
+				.deploy({
+					data: LotterexArtifact.bytecode,
+					arguments: [name]
 				})
+				.send({
+					from: accountId,
+					value: 0,
+					gas: 1_500_000
+				})
+				.once("transactionHash", console.log)
+				.once("sent", console.log)
+				.once("confirmation", console.log)
 				.once("receipt", receipt => {
-					setLotteries(lotteries => [
-						...lotteries,
-						{
-							name,
-							address: receipt.contractAddress ?? "",
-							manager: account
-						}
-					])
+					console.log(receipt)
+					addLotteryId(receipt.contractAddress!)
 					close()
 				})
 				.on("error", setError)
