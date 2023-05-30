@@ -35,6 +35,14 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 	}, [lottery])
 
 	useEffect(() => {
+		if (!opened && winner) {
+			setBalance(0)
+			setPlayers([])
+			setWinner(null)
+		}
+	}, [opened])
+
+	useEffect(() => {
 		if (web3 && accountId && lottery) {
 			lottery.methods
 				.manager()
@@ -54,12 +62,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
-			lottery.methods
-				.pickWinner()
-				.send({ from: accountId })
-				.then((result: any) => {
-					setWinner(result.events.Winner.returnValues.winner)
-				})
+			lottery.methods.pickWinner().call({ from: accountId }).then(setWinner)
 		}
 	}
 
@@ -80,7 +83,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 						players.map(p => (
 							<Badge
 								key={p}
-								color={winner ? (winner === "p" ? "green" : "gray") : "blue"}>
+								color={winner ? (winner === p ? "green" : "gray") : "blue"}>
 								{p}
 							</Badge>
 						))
@@ -88,13 +91,15 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 						<Badge color="red">No Players</Badge>
 					)}
 				</Box>
-				<Button
-					variant="light"
-					color="red"
-					onClick={handlePickWinner}
-					disabled={!players || players.length < 3}>
-					Pick Winner
-				</Button>
+				{!winner && (
+					<Button
+						variant="light"
+						color="red"
+						onClick={handlePickWinner}
+						disabled={!players || players.length < 3}>
+						Pick Winner
+					</Button>
+				)}
 			</Stack>
 		</Modal>
 	)
