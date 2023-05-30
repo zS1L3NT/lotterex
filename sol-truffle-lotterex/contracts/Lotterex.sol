@@ -11,15 +11,16 @@ contract Lotterex {
 		manager = msg.sender;
 	}
 
-	function getPlayers() external view returns (address[] memory) {
+	modifier onlyManager {
 		require(msg.sender == manager, "Only the manager can call this function");
+		_;
+	}
 
+	function getPlayers() onlyManager external view returns (address[] memory) {
 		return players;
 	}
 
-	function getBalance() external view returns (uint256) {
-		require(msg.sender == manager, "Only the manager can call this function");
-
+	function getBalance() onlyManager external view returns (uint256) {
 		return address(this).balance;
 	}
 
@@ -57,8 +58,7 @@ contract Lotterex {
 		}
 	}
 
-	function pickWinner() external returns (address) {
-		require(msg.sender == manager, "Only the manager can call this function");
+	function pickWinner() onlyManager external payable returns (address) {
 		require(players.length >= 3, "There are not enough players to pick a winner");
 
 		address payable winner = payable(players[random() % players.length]);
