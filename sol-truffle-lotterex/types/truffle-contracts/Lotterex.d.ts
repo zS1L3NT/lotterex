@@ -19,6 +19,8 @@ export interface LotterexInstance extends Truffle.ContractInstance {
     txDetails?: Truffle.TransactionDetails
   ): Promise<string>;
 
+  getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
+
   getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   hasEntered(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
@@ -48,6 +50,8 @@ export interface LotterexInstance extends Truffle.ContractInstance {
       arg0: number | BN | string,
       txDetails?: Truffle.TransactionDetails
     ): Promise<string>;
+
+    getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
     getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 

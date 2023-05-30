@@ -26,12 +26,23 @@ contract("Lotterex", accounts => {
 		}
 	})
 
+	it("should not allow a non-manager to view the balance", async () => {
+		const lotterex = await Lotterex.deployed()
+
+		try {
+			await lotterex.getPlayers({ from: accounts[1] })
+			assert(false)
+		} catch (err) {
+			assert(true)
+		}
+	})
+
 	it("should allow any player to enter the lottery", async () => {
 		const lotterex = await Lotterex.deployed()
 
 		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[1] })
 
-		const player = await lotterex.players(0)
+		const player = (await lotterex.getPlayers())[0]
 
 		assert.equal(player, accounts[1])
 		assert.equal((await lotterex.getBalance()).toString(), web3.utils.toWei("0.1", "ether"))
@@ -97,11 +108,11 @@ contract("Lotterex", accounts => {
 	it("should allow multiple users to join", async () => {
 		const lotterex = await Lotterex.deployed()
 
-		assert.equal(await lotterex.players(0), accounts[1])
+		assert.equal((await lotterex.getPlayers())[0], accounts[1])
 
 		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[2] })
 
-		assert.equal(await lotterex.players(1), accounts[2])
+		assert.equal((await lotterex.getPlayers())[1], accounts[2])
 	})
 
 	it("shouldn't allow a non-manager to pick a winner", async () => {
@@ -131,6 +142,7 @@ contract("Lotterex", accounts => {
 
 		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[3] })
 
+		assert.equal((await lotterex.getPlayers())[2], accounts[3])
 		assert.equal((await lotterex.getBalance()).toString(), web3.utils.toWei("0.3", "ether"))
 
 		const before = web3.utils
