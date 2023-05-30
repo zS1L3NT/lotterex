@@ -2,10 +2,12 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Lotterex {
+	string public name;
 	address public manager;
-	address[] public players;
+	address[] private players;
 
-	constructor() {
+	constructor(string memory _name) {
+		name = _name;
 		manager = msg.sender;
 	}
 

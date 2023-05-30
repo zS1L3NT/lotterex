@@ -8,6 +8,13 @@ contract("Lotterex", accounts => {
 		assert.equal(manager, accounts[0])
 	})
 
+	it("should set the name of the smart contract to 'testing'", async () => {
+		const lotterex = await Lotterex.deployed()
+		const name = await lotterex.name()
+
+		assert.equal(name, "testing")
+	})
+
 	it("should allow the manager to view the balance", async () => {
 		const lotterex = await Lotterex.deployed()
 		const balance = await lotterex.getBalance()
