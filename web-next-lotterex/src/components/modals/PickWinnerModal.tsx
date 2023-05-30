@@ -1,6 +1,7 @@
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
+import { Contract } from "web3"
 
 import { Badge, Box, Button, Code, Modal, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -8,22 +9,22 @@ import { useDisclosure } from "@mantine/hooks"
 import WalletContext from "../../contexts/WalletContext"
 
 export type PickWinnerModalRef = {
-	open: (address: string) => void
+	open: (lottery: Contract) => void
 	close: () => void
 }
 
 export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinnerModalRef>) {
-	const { account, contract } = useContext(WalletContext)
+	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
-	const [address, setAddress] = useState<string | null>(null)
+	const [lottery, setLottery] = useState<Contract | null>(null)
 	const [balance, setBalance] = useState<number | null>(null)
 	const [players, setPlayers] = useState<string[] | null>(null)
 	const [winner, setWinner] = useState<string | null>(null)
 
 	useImperativeHandle(ref, () => ({
-		open: address => {
-			setAddress(address)
+		open: lottery => {
+			setLottery(lottery)
 			open()
 		},
 		close
@@ -31,29 +32,33 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 
 	useEffect(() => {
 		close()
-	}, [account])
+	}, [lottery])
 
 	useEffect(() => {
-		if (address && account && contract) {
-			contract.methods
+		if (web3 && accountId && lottery) {
+			lottery.methods
 				.manager()
-				.call({ from: account })
-				.then((manager: string) => {
-					if (manager === account) {
-						contract.methods.getBalance().call({ from: account }).then(setBalance)
-						contract.methods.getPlayers().call({ from: account }).then(setPlayers)
+				.call({ from: accountId })
+				.then((managerId: string) => {
+					if (managerId === accountId) {
+						lottery.methods
+							.getBalance()
+							.call({ from: accountId })
+							.then((b: string) => +web3.utils.fromWei(b))
+							.then(setBalance)
+						lottery.methods.getPlayers().call({ from: accountId }).then(setPlayers)
 					} else {
-						console.warn({ manager, account })
+						console.warn({ managerId, accountId })
 					}
 				})
 		}
-	}, [address, account, contract])
+	}, [web3, accountId, lottery])
 
 	const handlePickWinner = () => {
-		if (account && contract) {
-			contract.methods
+		if (accountId && lottery) {
+			lottery.methods
 				.pickWinner()
-				.send({ from: account })
+				.send({ from: accountId })
 				.then((result: any) => {
 					setWinner(result.events.Winner.returnValues.winner)
 				})
@@ -69,7 +74,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 			<Stack>
 				<Box>
 					<Text>Balance: </Text>
-					<Code>{balance}</Code>
+					<Code>{balance} ETH</Code>
 				</Box>
 				<Box>
 					<Text>Players:</Text>

@@ -1,29 +1,30 @@
 import { useContext, useEffect, useState } from "react"
+import { Contract } from "web3"
 
 import { Badge, Box, Code, Flex, Paper, Title } from "@mantine/core"
 
 import WalletContext from "../contexts/WalletContext"
 
 export default function Lottery({
-	address,
+	lottery,
 	onPickWinner,
 	onEnterLottery
 }: {
-	address: string
+	lottery: Contract
 	onPickWinner: () => void
 	onEnterLottery: () => void
 }) {
-	const { account, contract } = useContext(WalletContext)
+	const { accountId } = useContext(WalletContext)
 
 	const [name, setName] = useState<string | null>(null)
-	const [manager, setManager] = useState<string | null>(null)
+	const [managerId, setManagerId] = useState<string | null>(null)
 
 	useEffect(() => {
-		if (account && contract) {
-			contract.methods.name().call({ from: account }).then(setName)
-			contract.methods.manager().call({ from: account }).then(setManager)
+		if (accountId) {
+			lottery.methods.name().call({ from: accountId }).then(setName)
+			lottery.methods.manager().call({ from: accountId }).then(setManagerId)
 		}
-	}, [account, contract])
+	}, [accountId])
 
 	return (
 		<Paper
@@ -36,15 +37,15 @@ export default function Lottery({
 			})}
 			shadow="xs"
 			p="md"
-			onClick={() => (manager === account ? onPickWinner() : onEnterLottery())}>
+			onClick={() => (managerId === accountId ? onPickWinner() : onEnterLottery())}>
 			<Box>
 				<Flex
 					gap="0.5rem"
 					align="center">
 					<Title order={3}>{name}</Title>
-					{manager === account && <Badge color="red">OWNER</Badge>}
+					{managerId === accountId && <Badge color="red">OWNER</Badge>}
 				</Flex>
-				<Code>{address}</Code>
+				<Code>{lottery.options.address}</Code>
 			</Box>
 		</Paper>
 	)

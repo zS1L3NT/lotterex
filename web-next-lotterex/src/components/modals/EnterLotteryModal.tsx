@@ -1,6 +1,7 @@
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
+import { Contract } from "web3"
 
 import { Box, Button, Modal, NumberInput, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -8,22 +9,22 @@ import { useDisclosure } from "@mantine/hooks"
 import WalletContext from "../../contexts/WalletContext"
 
 export type EnterLotteryModalRef = {
-	open: (address: string) => void
+	open: (lottery: Contract) => void
 	close: () => void
 }
 
 export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterLotteryModalRef>) {
-	const { web3, account, contract } = useContext(WalletContext)
+	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
-	const [address, setAddress] = useState<string | null>(null)
+	const [lottery, setLottery] = useState<Contract | null>(null)
 	const [name, setName] = useState<string | null>(null)
 	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
 	const [cost, setCost] = useState<number>(0.1)
 
 	useImperativeHandle(ref, () => ({
-		open: address => {
-			setAddress(address)
+		open: lottery => {
+			setLottery(lottery)
 			open()
 		},
 		close
@@ -31,21 +32,21 @@ export default forwardRef(function EnterLotteryModal(_, ref: ForwardedRef<EnterL
 
 	useEffect(() => {
 		close()
-	}, [account])
+	}, [lottery])
 
 	useEffect(() => {
-		if (contract) {
-			contract.methods.name().call().then(setName)
-			contract.methods.hasEntered().call({ from: account }).then(setHasEntered)
+		if (accountId && lottery) {
+			lottery.methods.name().call().then(setName)
+			lottery.methods.hasEntered().call({ from: accountId }).then(setHasEntered)
 		}
-	}, [contract])
+	}, [accountId, lottery])
 
 	const handleEnterLottery = () => {
-		if (web3 && account && address && contract) {
-			contract.methods
+		if (web3 && accountId && lottery) {
+			lottery.methods
 				.enter()
 				.send({
-					from: account,
+					from: accountId,
 					value: web3.utils.toWei(cost.toString(), "ether")
 				})
 				.then(console.log)

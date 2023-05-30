@@ -13,8 +13,8 @@ export type CreateLotteryModalRef = {
 }
 
 export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<CreateLotteryModalRef>) {
-	const { lotteries, setLotteries } = useContext(LotteriesContext)
-	const { web3, account, contract } = useContext(WalletContext)
+	const { addLotteryId } = useContext(LotteriesContext)
+	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [name, setName] = useState("")
@@ -23,19 +23,23 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 	useImperativeHandle(ref, () => ({ open, close }))
 
 	const handleCreate = async () => {
-		if (web3 && account && contract) {
-			await contract
+		if (web3 && accountId) {
+			await new web3.eth.Contract(LotterexArtifact.abi as any)
 				.deploy({
 					data: LotterexArtifact.bytecode,
 					arguments: [name]
 				})
 				.send({
-					from: account,
+					from: accountId,
 					value: 0,
 					gas: 1_500_000
 				})
+				.once("transactionHash", console.log)
+				.once("sent", console.log)
+				.once("confirmation", console.log)
 				.once("receipt", receipt => {
-					setLotteries([...lotteries, receipt.contractAddress!])
+					console.log(receipt)
+					addLotteryId(receipt.contractAddress!)
 					close()
 				})
 				.on("error", setError)

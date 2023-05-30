@@ -37,12 +37,12 @@ export default function Index() {
 						<IconPlus size={24} />
 					</ActionIcon>
 				</Flex>
-				{lotteries.map(address => (
+				{lotteries.map(lottery => (
 					<Lottery
-						key={address}
-						address={address}
-						onPickWinner={() => pickWinnerModalRef.current?.open(address)}
-						onEnterLottery={() => enterLotteryModalRef.current?.open(address)}
+						key={lottery.options.address}
+						lottery={lottery}
+						onPickWinner={() => pickWinnerModalRef.current?.open(lottery)}
+						onEnterLottery={() => enterLotteryModalRef.current?.open(lottery)}
 					/>
 				))}
 			</Stack>
