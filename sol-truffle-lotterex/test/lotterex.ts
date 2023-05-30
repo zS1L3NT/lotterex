@@ -33,7 +33,7 @@ contract("Lotterex", accounts => {
 		}
 	})
 
-	it("should not allow a non-manager to view the balance", async () => {
+	it("should not allow a non-manager to view the players", async () => {
 		const lotterex = await Lotterex.deployed()
 
 		try {
@@ -47,7 +47,7 @@ contract("Lotterex", accounts => {
 	it("should allow any player to enter the lottery", async () => {
 		const lotterex = await Lotterex.deployed()
 
-		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[1] })
+		await lotterex.enter({ from: accounts[1], value: web3.utils.toWei("0.1", "ether") })
 
 		const player = (await lotterex.getPlayers())[0]
 
@@ -65,7 +65,7 @@ contract("Lotterex", accounts => {
 		const lotterex = await Lotterex.deployed()
 
 		try {
-			await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[1] })
+			await lotterex.enter({ from: accounts[1], value: web3.utils.toWei("0.1", "ether") })
 			assert(false)
 		} catch (err) {
 			assert(true)
@@ -76,7 +76,7 @@ contract("Lotterex", accounts => {
 		const lotterex = await Lotterex.deployed()
 
 		try {
-			await lotterex.send(web3.utils.toWei("0.05", "ether"), { from: accounts[2] })
+			await lotterex.enter({ from: accounts[1], value: web3.utils.toWei("0.05", "ether") })
 			assert(false)
 		} catch (err) {
 			assert(true)
@@ -102,7 +102,7 @@ contract("Lotterex", accounts => {
 		const lotterex = await Lotterex.deployed()
 		const before = web3.utils.toBN(await web3.eth.getBalance(accounts[1]!))
 
-		await lotterex.send(web3.utils.toWei("0.2", "ether"), { from: accounts[1] })
+		await lotterex.enter({ from: accounts[1], value: web3.utils.toWei("0.2", "ether") })
 
 		const after = web3.utils.toBN(await web3.eth.getBalance(accounts[1]!))
 		const difference = before.sub(after)
@@ -117,7 +117,7 @@ contract("Lotterex", accounts => {
 
 		assert.equal((await lotterex.getPlayers())[0], accounts[1])
 
-		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[2] })
+		await lotterex.enter({ from: accounts[2], value: web3.utils.toWei("0.1", "ether") })
 
 		assert.equal((await lotterex.getPlayers())[1], accounts[2])
 	})
@@ -147,7 +147,7 @@ contract("Lotterex", accounts => {
 	it("should send the winner all the ETH in the contract", async () => {
 		const lotterex = await Lotterex.deployed()
 
-		await lotterex.send(web3.utils.toWei("0.1", "ether"), { from: accounts[3] })
+		await lotterex.enter({ from: accounts[3], value: web3.utils.toWei("0.1", "ether") })
 
 		assert.equal((await lotterex.getPlayers())[2], accounts[3])
 		assert.equal((await lotterex.getBalance()).toString(), web3.utils.toWei("0.3", "ether"))
