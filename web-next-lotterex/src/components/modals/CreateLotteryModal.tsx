@@ -1,9 +1,9 @@
 import { ForwardedRef, forwardRef, useContext, useImperativeHandle, useState } from "react"
-import { useLocalstorageState } from "rooks"
 
 import { Alert, Button, Modal, Stack, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 
+import LotteriesContext from "../../contexts/LotteriesContext"
 import WalletContext from "../../contexts/WalletContext"
 import LotterexArtifact from "../../contracts/Lotterex.json"
 
@@ -13,34 +13,29 @@ export type CreateLotteryModalRef = {
 }
 
 export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<CreateLotteryModalRef>) {
+	const { lotteries, setLotteries } = useContext(LotteriesContext)
 	const { web3, account, contract } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [name, setName] = useState("")
 	const [error, setError] = useState<Error | null>(null)
-	const [, setLotteries] = useLocalstorageState<Lottery[]>("lotteries", [])
 
 	useImperativeHandle(ref, () => ({ open, close }))
 
 	const handleCreate = async () => {
 		if (web3 && account && contract) {
-			const tx = await contract.deploy({ data: LotterexArtifact.bytecode })
-
-			await tx
+			await contract
+				.deploy({
+					data: LotterexArtifact.bytecode,
+					arguments: [name]
+				})
 				.send({
 					from: account,
 					value: 0,
-					gas: 1_000_000
+					gas: 1_500_000
 				})
 				.once("receipt", receipt => {
-					setLotteries(lotteries => [
-						...lotteries,
-						{
-							name,
-							address: receipt.contractAddress ?? "",
-							manager: account
-						}
-					])
+					setLotteries([...lotteries, receipt.contractAddress!])
 					close()
 				})
 				.on("error", setError)
