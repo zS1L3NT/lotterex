@@ -57,7 +57,7 @@ contract Lotterex {
 		}
 	}
 
-	function pickWinner() external {
+	function pickWinner() external returns (address) {
 		require(msg.sender == manager, "Only the manager can call this function");
 		require(players.length >= 3, "There are not enough players to pick a winner");
 
@@ -65,6 +65,8 @@ contract Lotterex {
 
 		winner.transfer(address(this).balance);
 		players = new address[](0);
+
+		return winner;
 	}
 
 	function random() private view returns (uint256) {
