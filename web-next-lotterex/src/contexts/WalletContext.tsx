@@ -6,16 +6,14 @@ import LotterexArtifact from "../contracts/Lotterex.json"
 
 const WalletContext = createContext({
 	web3: null as Web3 | null,
-	accounts: null as string[] | null,
-	networkID: null as number | null,
+	account: null as string | null,
 	contract: null as Contract | null
 })
 
 export default WalletContext
 export const WalletProvider = ({ children }: PropsWithChildren) => {
 	const [web3, setWeb3] = useState<Web3 | null>(null)
-	const [accounts, setAccounts] = useState<string[] | null>(null)
-	const [networkID, setNetworkID] = useState<number | null>(null)
+	const [account, setAccount] = useState<string | null>(null)
 	const [contract, setContract] = useState<Contract | null>(null)
 
 	useEffect(() => {
@@ -33,7 +31,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
 	const updateWallet = async () => {
 		const artifact = LotterexArtifact as any
 		const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
-		const accounts = await web3.eth.requestAccounts()
+		const account = (await web3.eth.requestAccounts())[0] ?? null
 		const networkID = await web3.eth.net.getId()
 
 		let contract: Contract | null = null
@@ -44,8 +42,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
 		}
 
 		setWeb3(web3)
-		setAccounts(accounts)
-		setNetworkID(networkID)
+		setAccount(account)
 		setContract(contract)
 	}
 
@@ -53,8 +50,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
 		<WalletContext.Provider
 			value={{
 				web3,
-				accounts,
-				networkID,
+				account,
 				contract
 			}}>
 			{children}
