@@ -22,7 +22,6 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 	const [lottery, setLottery] = useState<Contract | null>(null)
 	const [balance, setBalance] = useState<number | null>(null)
 	const [players, setPlayers] = useState<string[] | null>(null)
-	const [winner, setWinner] = useState<string | null>(null)
 
 	useImperativeHandle(ref, () => ({
 		open: lottery => {
@@ -37,10 +36,9 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 	}, [lottery])
 
 	useEffect(() => {
-		if (!opened && winner) {
+		if (!opened) {
 			setBalance(0)
 			setPlayers([])
-			setWinner(null)
 		}
 	}, [opened])
 
@@ -131,7 +129,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 						players.map(p => (
 							<Badge
 								key={p}
-								color={winner ? (winner === p ? "green" : "gray") : "blue"}>
+								color="blue">
 								{p}
 							</Badge>
 						))
@@ -139,15 +137,13 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 						<Badge color="red">No Players</Badge>
 					)}
 				</Box>
-				{!winner && (
-					<Button
-						variant="light"
-						color="red"
-						onClick={handlePickWinner}
-						disabled={!players || players.length < 3}>
-						Pick Winner
-					</Button>
-				)}
+				<Button
+					variant="light"
+					color="red"
+					onClick={handlePickWinner}
+					disabled={!players || players.length < 3}>
+					Pick Winner
+				</Button>
 			</Stack>
 		</Modal>
 	)
