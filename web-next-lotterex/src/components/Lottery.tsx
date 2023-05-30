@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react"
 import { Contract } from "web3"
 
 import { Badge, Box, Code, Flex, Paper, Title } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
+import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../contexts/WalletContext"
 
@@ -21,8 +23,34 @@ export default function Lottery({
 
 	useEffect(() => {
 		if (accountId) {
-			lottery.methods.name().call({ from: accountId }).then(setName)
-			lottery.methods.manager().call({ from: accountId }).then(setManagerId)
+			lottery.methods
+				.name()
+				.call({ from: accountId })
+				.then(setName)
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery name",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+			lottery.methods
+				.manager()
+				.call({ from: accountId })
+				.then(setManagerId)
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery manager",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 		}
 	}, [accountId])
 

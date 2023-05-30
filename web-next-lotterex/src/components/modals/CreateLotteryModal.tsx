@@ -1,7 +1,9 @@
 import { ForwardedRef, forwardRef, useContext, useImperativeHandle, useState } from "react"
 
-import { Alert, Button, Modal, Stack, TextInput } from "@mantine/core"
+import { Button, Modal, Stack, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
+import { IconX } from "@tabler/icons-react"
 
 import LotteriesContext from "../../contexts/LotteriesContext"
 import WalletContext from "../../contexts/WalletContext"
@@ -18,7 +20,6 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [name, setName] = useState("")
-	const [error, setError] = useState<Error | null>(null)
 
 	useImperativeHandle(ref, () => ({ open, close }))
 
@@ -38,7 +39,16 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 					addLotteryId(receipt.contractAddress!)
 					close()
 				})
-				.on("error", setError)
+				.on("error", error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error creating lottery",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 		}
 	}
 
@@ -62,14 +72,6 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 					disabled={!name}>
 					Create
 				</Button>
-				{error && (
-					<Alert
-						withCloseButton
-						onClose={() => setError(null)}
-						color="red">
-						{error.message}
-					</Alert>
-				)}
 			</Stack>
 		</Modal>
 	)

@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core"
+import { Notifications } from "@mantine/notifications"
 
 import { LotteriesProvider } from "../contexts/LotteriesContext"
 import { WalletProvider } from "../contexts/WalletContext"
@@ -10,6 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		<MantineProvider
 			withGlobalStyles
 			withNormalizeCSS>
+			<Notifications />
 			<WalletProvider>
 				<LotteriesProvider>
 					<Component {...pageProps} />

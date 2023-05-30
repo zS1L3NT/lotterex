@@ -5,6 +5,8 @@ import { Contract } from "web3"
 
 import { Badge, Box, Button, Code, Modal, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
+import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 
@@ -54,15 +56,61 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 							.call({ from: accountId })
 							.then((b: string) => +web3.utils.fromWei(b))
 							.then(setBalance)
-						lottery.methods.getPlayers().call({ from: accountId }).then(setPlayers)
+							.catch((error: Error) => {
+								notifications.show({
+									withCloseButton: true,
+									autoClose: false,
+									title: "Error getting lottery balance",
+									message: error.message,
+									color: "red",
+									icon: <IconX />
+								})
+							})
+						lottery.methods
+							.getPlayers()
+							.call({ from: accountId })
+							.then(setPlayers)
+							.catch((error: Error) => {
+								notifications.show({
+									withCloseButton: true,
+									autoClose: false,
+									title: "Error getting lottery players",
+									message: error.message,
+									color: "red",
+									icon: <IconX />
+								})
+							})
 					}
+				})
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error entering lottery",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
 				})
 		}
 	}, [web3, accountId, lottery])
 
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
-			lottery.methods.pickWinner().call({ from: accountId }).then(setWinner)
+			lottery.methods
+				.pickWinner()
+				.send({ from: accountId, gas: 100_000 })
+				.then(close)
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error picking lottery winner",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 		}
 	}
 

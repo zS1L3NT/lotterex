@@ -7,6 +7,9 @@ dependencies:
   '@mantine/hooks':
     specifier: ^6.0.11
     version: 6.0.11(react@18.2.0)
+  '@mantine/notifications':
+    specifier: ^6.0.13
+    version: 6.0.13(@mantine/core@6.0.11)(@mantine/hooks@6.0.11)(react-dom@18.2.0)(react@18.2.0)
   '@metamask/providers':
     specifier: ^11.0.0
     version: 11.0.0
@@ -484,6 +487,22 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@mantine/notifications@6.0.13(@mantine/core@6.0.11)(@mantine/hooks@6.0.11)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-d3BxNN7LEblvAsui0yGiI1q1Ji2OlhFLfe/cLdj7s5VMOtiKYRV14dICJxe4Jn/o+8Gg+UKw+aO/ZiQoT+BGIw==}
+    peerDependencies:
+      '@mantine/core': 6.0.13
+      '@mantine/hooks': 6.0.13
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@mantine/core': 6.0.11(@emotion/react@11.11.0)(@mantine/hooks@6.0.11)(@types/react@18.2.7)(react-dom@18.2.0)(react@18.2.0)
+      '@mantine/hooks': 6.0.11(react@18.2.0)
+      '@mantine/utils': 6.0.13(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-transition-group: 4.4.2(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
   /@mantine/styles@6.0.11(@emotion/react@11.11.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-SNqDIfgs3DVUHsFQ9+5MdZ3CkNHutBCAeaBL1PxlOxhNWB0tlii61rTAwUULxhu8p9MBNMae2UvDUN+gUPvA/A==}
     peerDependencies:
@@ -500,6 +519,14 @@ packages:
 
   /@mantine/utils@6.0.11(react@18.2.0):
     resolution: {integrity: sha512-ijkEAaKEhZCw7HSWsGMQZsvfmQKmJXmPoQ1LeEwcH3vjZalPk9pQjSPPfUdTeX9ZAv095XWmfVMiNV8+xvM0OQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /@mantine/utils@6.0.13(react@18.2.0):
+    resolution: {integrity: sha512-iqIU9wurqAeccVbWjM0yr1JGne5VP+ob55M03QAXOEN4+ck93VDTjCkZJR2RFhDcs5q0twQFoOmU/gULR8aKIA==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
@@ -1787,6 +1814,13 @@ packages:
     engines: {node: '>=6.0.0'}
     dependencies:
       esutils: 2.0.3
+
+  /dom-helpers@5.2.1:
+    resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
+    dependencies:
+      '@babel/runtime': 7.22.3
+      csstype: 3.1.2
+    dev: false
 
   /dom-walk@0.1.2:
     resolution: {integrity: sha512-6QvTW9mrGeIegrFXdtQi9pk7O/nSK6lSdXW2eqUspN5LWD7UTji2Fqw5V2YLjBpHEoU9Xl/eUWNpDeZvoyOv2w==}
@@ -4039,6 +4073,20 @@ packages:
       use-latest: 1.2.1(@types/react@18.2.7)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /react-transition-group@4.4.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg==}
+    peerDependencies:
+      react: '>=16.6.0'
+      react-dom: '>=16.6.0'
+    dependencies:
+      '@babel/runtime': 7.22.3
+      dom-helpers: 5.2.1
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react@18.2.0:

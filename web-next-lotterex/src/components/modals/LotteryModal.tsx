@@ -5,6 +5,8 @@ import { Contract } from "web3"
 
 import { Box, Button, Modal, NumberInput, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
+import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 
@@ -36,19 +38,55 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	useEffect(() => {
 		if (accountId && lottery) {
-			lottery.methods.name().call().then(setName)
-			lottery.methods.hasEntered().call({ from: accountId }).then(setHasEntered)
+			lottery.methods
+				.name()
+				.call()
+				.then(setName)
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery name",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+			lottery.methods
+				.hasEntered()
+				.call({ from: accountId })
+				.then(setHasEntered)
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery entry status",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 		}
 	}, [accountId, lottery])
 
 	const handleEnterLottery = () => {
 		if (web3 && accountId && lottery) {
-			lottery.methods
+			 lottery.methods
 				.enter()
 				.send({ from: accountId, value: web3.utils.toWei(cost.toString(), "ether") })
 				.then(() => {
 					setHasEntered(true)
 					close()
+				})
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error entering lottery",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
 				})
 		}
 	}
@@ -61,6 +99,16 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 				.then(() => {
 					setHasEntered(false)
 					close()
+				})
+				.catch((error: Error) => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error leaving lottery",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
 				})
 		}
 	}
