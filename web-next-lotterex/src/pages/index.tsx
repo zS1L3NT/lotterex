@@ -1,5 +1,4 @@
 import { useContext, useRef } from "react"
-import { useLocalstorageState } from "rooks"
 
 import { ActionIcon, Badge, Box, Code, Flex, Stack, Title, useMantineTheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -8,15 +7,16 @@ import { IconPlus } from "@tabler/icons-react"
 import CreateLotteryModal, { CreateLotteryModalRef } from "../components/modals/CreateLotteryModal"
 import EnterLotteryModal, { EnterLotteryModalRef } from "../components/modals/EnterLotteryModal"
 import PickWinnerModal, { PickWinnerModalRef } from "../components/modals/PickWinnerModal"
+import LotteriesContext from "../contexts/LotteriesContext"
 import WalletContext from "../contexts/WalletContext"
 
 export default function Index() {
+	const { lotteries } = useContext(LotteriesContext)
 	const { account } = useContext(WalletContext)
 	const theme = useMantineTheme()
 
 	const isBelowXs = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
-	const [lotteries] = useLocalstorageState<Lottery[]>("lotteries", [])
 	const createLotteryModalRef = useRef<CreateLotteryModalRef>(null)
 	const enterLotteryModalRef = useRef<EnterLotteryModalRef>(null)
 	const pickWinnerModalRef = useRef<PickWinnerModalRef>(null)
