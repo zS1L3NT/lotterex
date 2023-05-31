@@ -1,17 +1,17 @@
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
-import { Contract } from "web3"
+import { AppContract } from "web3-eth-contract"
 
 import { Badge, Box, Button, Code, Modal, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { IconX } from "@tabler/icons-react"
+import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 
 export type PickWinnerModalRef = {
-	open: (lottery: Contract) => void
+	open: (lottery: AppContract) => void
 	close: () => void
 }
 
@@ -19,7 +19,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
-	const [lottery, setLottery] = useState<Contract | null>(null)
+	const [lottery, setLottery] = useState<AppContract | null>(null)
 	const [balance, setBalance] = useState<number | null>(null)
 	const [players, setPlayers] = useState<string[] | null>(null)
 
@@ -33,28 +33,19 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 
 	useEffect(() => {
 		close()
-	}, [lottery])
-
-	useEffect(() => {
-		if (!opened) {
-			setBalance(0)
-			setPlayers([])
-		}
-	}, [opened])
+	}, [accountId])
 
 	useEffect(() => {
 		if (web3 && accountId && lottery) {
-			lottery.methods
-				.manager()
+			lottery.methods.manager!<string>()
 				.call({ from: accountId })
-				.then((managerId: string) => {
+				.then(managerId => {
 					if (managerId === accountId) {
-						lottery.methods
-							.getBalance()
+						lottery.methods.getBalance!<number>()
 							.call({ from: accountId })
-							.then((b: string) => +web3.utils.fromWei(b))
+							.then(b => +web3.utils.fromWei(b + ""))
 							.then(setBalance)
-							.catch((error: Error) => {
+							.catch(error => {
 								notifications.show({
 									withCloseButton: true,
 									autoClose: false,
@@ -64,11 +55,10 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 									icon: <IconX />
 								})
 							})
-						lottery.methods
-							.getPlayers()
+						lottery.methods.getPlayers!<string[]>()
 							.call({ from: accountId })
 							.then(setPlayers)
-							.catch((error: Error) => {
+							.catch(error => {
 								notifications.show({
 									withCloseButton: true,
 									autoClose: false,
@@ -80,7 +70,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 							})
 					}
 				})
-				.catch((error: Error) => {
+				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
@@ -95,11 +85,22 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
-			lottery.methods
-				.pickWinner()
+			lottery.methods.pickWinner!()
 				.send({ from: accountId, gas: 100_000 })
-				.then(close)
-				.catch((error: Error) => {
+				.once("receipt", receipt => {
+					setBalance(0)
+					setPlayers([])
+					close()
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Picked Lottery Winner",
+						message: <Code>{receipt.transactionHash}</Code>,
+						color: "green",
+						icon: <IconCheck />
+					})
+				})
+				.on("error", error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,

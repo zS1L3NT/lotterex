@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Contract } from "web3"
+import { AppContract } from "web3-eth-contract"
 
 import { Badge, Box, Code, Flex, Paper, Title } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
@@ -12,7 +12,7 @@ export default function Lottery({
 	onPickWinner,
 	onEnterLottery
 }: {
-	lottery: Contract
+	lottery: AppContract
 	onPickWinner: () => void
 	onEnterLottery: () => void
 }) {
@@ -23,11 +23,10 @@ export default function Lottery({
 
 	useEffect(() => {
 		if (accountId) {
-			lottery.methods
-				.name()
+			lottery.methods.name!<string>()
 				.call({ from: accountId })
 				.then(setName)
-				.catch((error: Error) => {
+				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
@@ -37,11 +36,10 @@ export default function Lottery({
 						icon: <IconX />
 					})
 				})
-			lottery.methods
-				.manager()
+			lottery.methods.manager!<string>()
 				.call({ from: accountId })
 				.then(setManagerId)
-				.catch((error: Error) => {
+				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,

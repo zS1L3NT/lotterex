@@ -1,17 +1,17 @@
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
-import { Contract } from "web3"
+import { AppContract } from "web3-eth-contract"
 
-import { Box, Button, Modal, NumberInput, Stack, Text } from "@mantine/core"
+import { Box, Button, Code, Modal, NumberInput, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { IconX } from "@tabler/icons-react"
+import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 
 export type LotteryModalRef = {
-	open: (lottery: Contract) => void
+	open: (lottery: AppContract) => void
 	close: () => void
 }
 
@@ -19,7 +19,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
-	const [lottery, setLottery] = useState<Contract | null>(null)
+	const [lottery, setLottery] = useState<AppContract | null>(null)
 	const [name, setName] = useState<string | null>(null)
 	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
 	const [cost, setCost] = useState<number>(0.1)
@@ -34,15 +34,14 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	useEffect(() => {
 		close()
-	}, [lottery])
+	}, [accountId])
 
 	useEffect(() => {
 		if (accountId && lottery) {
-			lottery.methods
-				.name()
+			lottery.methods.name!<string>()
 				.call()
 				.then(setName)
-				.catch((error: Error) => {
+				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
@@ -52,11 +51,10 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						icon: <IconX />
 					})
 				})
-			lottery.methods
-				.hasEntered()
+			lottery.methods.hasEntered!<boolean>()
 				.call({ from: accountId })
 				.then(setHasEntered)
-				.catch((error: Error) => {
+				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
@@ -71,14 +69,21 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	const handleEnterLottery = () => {
 		if (web3 && accountId && lottery) {
-			 lottery.methods
-				.enter()
+			lottery.methods.enter!()
 				.send({ from: accountId, value: web3.utils.toWei(cost.toString(), "ether") })
-				.then(() => {
+				.once("receipt", receipt => {
 					setHasEntered(true)
 					close()
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Entered Lottery",
+						message: <Code>{receipt.transactionHash}</Code>,
+						color: "green",
+						icon: <IconCheck />
+					})
 				})
-				.catch((error: Error) => {
+				.on("error", error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
@@ -93,14 +98,21 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	const handleLeaveLottery = () => {
 		if (web3 && accountId && lottery) {
-			lottery.methods
-				.leave()
+			lottery.methods.leave!()
 				.send({ from: accountId })
-				.then(() => {
+				.once("receipt", receipt => {
 					setHasEntered(false)
 					close()
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Left Lottery",
+						message: <Code>{receipt.transactionHash}</Code>,
+						color: "green",
+						icon: <IconCheck />
+					})
 				})
-				.catch((error: Error) => {
+				.on("error", error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,

@@ -1,9 +1,9 @@
 import { ForwardedRef, forwardRef, useContext, useImperativeHandle, useState } from "react"
 
-import { Button, Modal, Stack, TextInput } from "@mantine/core"
+import { Button, Code, Modal, Stack, TextInput } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { IconX } from "@tabler/icons-react"
+import { IconCheck, IconX } from "@tabler/icons-react"
 
 import LotteriesContext from "../../contexts/LotteriesContext"
 import WalletContext from "../../contexts/WalletContext"
@@ -38,6 +38,14 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 				.once("receipt", receipt => {
 					addLotteryId(receipt.contractAddress!)
 					close()
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Created Lottery",
+						message: <Code>{receipt.transactionHash}</Code>,
+						color: "green",
+						icon: <IconCheck />
+					})
 				})
 				.on("error", error => {
 					notifications.show({

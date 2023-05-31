@@ -43,6 +43,9 @@ dependencies:
   web3:
     specifier: ^1.10.0
     version: 1.10.0
+  web3-eth-contract:
+    specifier: ^1.10.0
+    version: 1.10.0
 
 devDependencies:
   '@typescript-eslint/eslint-plugin':
