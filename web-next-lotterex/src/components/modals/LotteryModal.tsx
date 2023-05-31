@@ -77,6 +77,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 				})
 				.once("receipt", receipt => {
 					setHasEntered(true)
+					setCost(0.1)
 					close()
 					notifications.show({
 						withCloseButton: true,

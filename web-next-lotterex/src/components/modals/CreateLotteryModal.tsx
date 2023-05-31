@@ -37,6 +37,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 				})
 				.once("receipt", receipt => {
 					addLotteryId(receipt.contractAddress!)
+					setName("")
 					close()
 					notifications.show({
 						withCloseButton: true,
