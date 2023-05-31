@@ -2,13 +2,22 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Lotterex {
+	bool public open;
 	string public name;
 	address public manager;
+	uint256 public price;
 	address[] private players;
 
-	constructor(string memory _name) {
+	constructor(string memory _name, uint256 _price) {
+		open = true;
 		name = _name;
+		price = _price;
 		manager = msg.sender;
+	}
+
+	modifier isOpen {
+		require(open, "The lottery is closed");
+		_;
 	}
 
 	modifier onlyManager {
@@ -16,15 +25,15 @@ contract Lotterex {
 		_;
 	}
 
-	function getPlayers() onlyManager external view returns (address[] memory) {
+	function getPlayers() isOpen onlyManager external view returns (address[] memory) {
 		return players;
 	}
 
-	function getBalance() onlyManager external view returns (uint256) {
+	function getBalance() isOpen onlyManager external view returns (uint256) {
 		return address(this).balance;
 	}
 
-	function hasEntered() public view returns (bool) {
+	function hasEntered() isOpen public view returns (bool) {
 		for (uint256 i = 0; i < players.length; i++) {
 			if (players[i] == msg.sender) {
 				return true;
@@ -34,18 +43,18 @@ contract Lotterex {
 		return false;
 	}
 
-	receive() external payable {
+	receive() isOpen external payable {
 		require(!hasEntered(), "You have already entered");
-		require(msg.value >= 0.1 ether, "You must send 0.1 ether to enter");
+		require(msg.value >= price, "You did not send enough ether to enter");
 
-		if (msg.value > 0.1 ether) {
-			payable(msg.sender).transfer(msg.value - 0.1 ether);
+		if (msg.value > price) {
+			payable(msg.sender).transfer(msg.value - price);
 		}
 
 		players.push(msg.sender);
 	}
 
-	function leave() external {
+	function leave() isOpen external {
 		require(hasEntered(), "You have not entered the lottery");
 		
 		for (uint256 i = 0; i < players.length; i++) {
@@ -53,20 +62,26 @@ contract Lotterex {
 				// The only way to delete an element from an array, changing it's length
 				players[i] = players[players.length - 1];
 				players.pop();
-				payable(msg.sender).transfer(0.1 ether);
+				payable(msg.sender).transfer(price);
 			}
 		}
 	}
 
-	function pickWinner() onlyManager external returns (address) {
+	function pickWinner() isOpen onlyManager external {
 		require(players.length >= 3, "There are not enough players to pick a winner");
 
 		address payable winner = payable(players[random() % players.length]);
 
 		winner.transfer(address(this).balance);
 		players = new address[](0);
+	}
 
-		return winner;
+	function close() isOpen onlyManager external {
+		for (uint256 i = 0; i < players.length; i++) {
+			payable(players[i]).transfer(price);
+		}
+
+		open = false;
 	}
 
 	function random() private view returns (uint256) {

@@ -8,6 +8,7 @@ import { EventData, PastEventOptions } from "web3-eth-contract";
 export interface LotterexContract extends Truffle.Contract<LotterexInstance> {
   "new"(
     _name: string,
+    _price: number | BN | string,
     meta?: Truffle.TransactionDetails
   ): Promise<LotterexInstance>;
 }
@@ -18,6 +19,10 @@ export interface LotterexInstance extends Truffle.ContractInstance {
   manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
   name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  open(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
+
+  price(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
   getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
@@ -38,7 +43,16 @@ export interface LotterexInstance extends Truffle.ContractInstance {
     (txDetails?: Truffle.TransactionDetails): Promise<
       Truffle.TransactionResponse<AllEvents>
     >;
-    call(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  close: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse<AllEvents>
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
     sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
     estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
   };
@@ -47,6 +61,10 @@ export interface LotterexInstance extends Truffle.ContractInstance {
     manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
     name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+    open(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
+
+    price(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
     getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
@@ -67,7 +85,16 @@ export interface LotterexInstance extends Truffle.ContractInstance {
       (txDetails?: Truffle.TransactionDetails): Promise<
         Truffle.TransactionResponse<AllEvents>
       >;
-      call(txDetails?: Truffle.TransactionDetails): Promise<string>;
+      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+      sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+      estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+    };
+
+    close: {
+      (txDetails?: Truffle.TransactionDetails): Promise<
+        Truffle.TransactionResponse<AllEvents>
+      >;
+      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
       sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
       estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
     };
