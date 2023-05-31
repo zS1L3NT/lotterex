@@ -20,6 +20,7 @@ export default function Lottery({
 
 	const [name, setName] = useState<string | null>(null)
 	const [managerId, setManagerId] = useState<string | null>(null)
+	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
 
 	useEffect(() => {
 		if (accountId) {
@@ -39,6 +40,19 @@ export default function Lottery({
 			lottery.methods.manager!<string>()
 				.call({ from: accountId })
 				.then(setManagerId)
+				.catch(error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery manager",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+			lottery.methods.hasEntered!<boolean>()
+				.call({ from: accountId })
+				.then(setHasEntered)
 				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
@@ -70,6 +84,7 @@ export default function Lottery({
 					align="center">
 					<Title order={3}>{name}</Title>
 					{managerId === accountId && <Badge color="red">OWNER</Badge>}
+					{hasEntered && <Badge color="yellow">ENTERED</Badge>}
 				</Flex>
 				<Code>{lottery.options.address}</Code>
 			</Box>
