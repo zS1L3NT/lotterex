@@ -1,22 +1,22 @@
 {
 	"name": "sol-truffle-lotterex",
+	"description": "Smart Contract for Lotterex",
+	"author": "zS1L3NT <zechariahtan144@gmail.com> (https://www.zectan.com)",
+	"license": "GPL-3.0",
 	"scripts": {
-		"build": "truffle migrate --reset && pnpx typechain --target=truffle-v5 \"../web-next-lotterex/src/contracts/*.json\"",
+		"build": "truffle migrate --reset && typechain --target=truffle-v5 \"../web-next-lotterex/src/contracts/*.json\"",
 		"test": "truffle test"
 	},
 	"dependencies": {
-		"@openzeppelin/contracts": "^4.9.0",
-		"@truffle/hdwallet-provider": "^2.1.7",
 		"@typechain/truffle-v5": "^8.0.3",
 		"truffle": "^5.9.2",
+		"ts-node": "^10.9.1",
 		"typechain": "^8.2.0"
 	},
 	"devDependencies": {
 		"@types/bn.js": "^5.1.1",
-		"@types/chai": "^4.3.5",
 		"@types/mocha": "^10.0.1",
 		"@types/node": "latest",
-		"ts-node": "latest",
 		"typescript": "latest",
 		"web3": "^1.10.0",
 		"web3-core": "^1.10.0",
