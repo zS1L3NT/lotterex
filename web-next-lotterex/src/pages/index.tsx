@@ -1,16 +1,19 @@
 import { useContext, useRef } from "react"
 
-import { ActionIcon, Flex, Stack, Title, useMantineTheme } from "@mantine/core"
+import { ActionIcon, Alert, Flex, Stack, Title, useMantineTheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
-import { IconPlus } from "@tabler/icons-react"
+import { IconAlertTriangle, IconPlus } from "@tabler/icons-react"
 
 import Lottery from "../components/Lottery"
 import CreateLotteryModal, { CreateLotteryModalRef } from "../components/modals/CreateLotteryModal"
 import LotteryModal, { LotteryModalRef } from "../components/modals/LotteryModal"
 import PickWinnerModal, { PickWinnerModalRef } from "../components/modals/PickWinnerModal"
 import LotteriesContext from "../contexts/LotteriesContext"
+import WalletContext from "../contexts/WalletContext"
+import LotteriesArtifact from "../contracts/Lotterex.json"
 
 export default function Index() {
+	const { networkId } = useContext(WalletContext)
 	const { lotteries } = useContext(LotteriesContext)
 	const theme = useMantineTheme()
 
@@ -19,6 +22,8 @@ export default function Index() {
 	const createLotteryModalRef = useRef<CreateLotteryModalRef>(null)
 	const lotteryModalRef = useRef<LotteryModalRef>(null)
 	const pickWinnerModalRef = useRef<PickWinnerModalRef>(null)
+
+	const isCorrectNetwork = networkId + "" in LotteriesArtifact.networks
 
 	return (
 		<>
@@ -37,19 +42,32 @@ export default function Index() {
 						<IconPlus size={24} />
 					</ActionIcon>
 				</Flex>
-				{lotteries.map(lottery => (
-					<Lottery
-						key={lottery.options.address}
-						lottery={lottery}
-						onPickWinner={() => pickWinnerModalRef.current?.open(lottery)}
-						onEnterLottery={() => lotteryModalRef.current?.open(lottery)}
-					/>
-				))}
+				{isCorrectNetwork ? (
+					lotteries.map(lottery => (
+						<Lottery
+							key={lottery.options.address}
+							lottery={lottery}
+							onPickWinner={() => pickWinnerModalRef.current?.open(lottery)}
+							onEnterLottery={() => lotteryModalRef.current?.open(lottery)}
+						/>
+					))
+				) : (
+					<Alert
+						icon={<IconAlertTriangle />}
+						color="red"
+						title="Wrong Network">
+						Your Wallet is not connected to the network of the smart contracts
+					</Alert>
+				)}
 			</Stack>
 
-			<CreateLotteryModal ref={createLotteryModalRef} />
-			<LotteryModal ref={lotteryModalRef} />
-			<PickWinnerModal ref={pickWinnerModalRef} />
+			{isCorrectNetwork && (
+				<>
+					<CreateLotteryModal ref={createLotteryModalRef} />
+					<LotteryModal ref={lotteryModalRef} />
+					<PickWinnerModal ref={pickWinnerModalRef} />
+				</>
+			)}
 		</>
 	)
 }
