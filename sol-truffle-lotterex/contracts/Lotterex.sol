@@ -58,7 +58,7 @@ contract Lotterex {
 		}
 	}
 
-	function pickWinner() onlyManager external payable returns (address) {
+	function pickWinner() onlyManager external returns (address) {
 		require(players.length >= 3, "There are not enough players to pick a winner");
 
 		address payable winner = payable(players[random() % players.length]);

@@ -1,11 +1,14 @@
-import { useContext, useRef } from "react"
+import { useContext, useRef, useState } from "react"
 
-import { ActionIcon, Alert, Flex, Stack, Title, useMantineTheme } from "@mantine/core"
+import {
+	ActionIcon, Alert, Flex, SegmentedControl, Stack, Title, useMantineTheme
+} from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { IconAlertTriangle, IconPlus } from "@tabler/icons-react"
 
 import Lottery from "../components/Lottery"
 import CreateLotteryModal, { CreateLotteryModalRef } from "../components/modals/CreateLotteryModal"
+import DeveloperModal, { DeveloperModalRef } from "../components/modals/DeveloperModal"
 import LotteryModal, { LotteryModalRef } from "../components/modals/LotteryModal"
 import PickWinnerModal, { PickWinnerModalRef } from "../components/modals/PickWinnerModal"
 import LotteriesContext from "../contexts/LotteriesContext"
@@ -19,9 +22,11 @@ export default function Index() {
 
 	const isBelowXs = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
+	const [mode, setMode] = useState<"Developer" | "User">("User")
 	const createLotteryModalRef = useRef<CreateLotteryModalRef>(null)
 	const lotteryModalRef = useRef<LotteryModalRef>(null)
 	const pickWinnerModalRef = useRef<PickWinnerModalRef>(null)
+	const developerModalRef = useRef<DeveloperModalRef>(null)
 
 	const isCorrectNetwork = networkId + "" in LotteriesArtifact.networks
 
@@ -32,9 +37,15 @@ export default function Index() {
 				mt="3rem"
 				mx={isBelowXs ? "md" : "auto"}>
 				<Flex
-					justify="space-between"
-					align="center">
+					align="center"
+					gap="md">
 					<Title>Lotteries</Title>
+					<SegmentedControl
+						ml="auto"
+						data={["Developer", "User"]}
+						value={mode}
+						onChange={e => setMode(e as typeof mode)}
+					/>
 					<ActionIcon
 						variant="light"
 						size={36}
@@ -47,8 +58,16 @@ export default function Index() {
 						<Lottery
 							key={lottery.options.address}
 							lottery={lottery}
-							onPickWinner={() => pickWinnerModalRef.current?.open(lottery)}
-							onEnterLottery={() => lotteryModalRef.current?.open(lottery)}
+							onPickWinner={() =>
+								mode === "User"
+									? pickWinnerModalRef.current?.open(lottery)
+									: developerModalRef.current?.open(lottery)
+							}
+							onEnterLottery={() =>
+								mode === "User"
+									? lotteryModalRef.current?.open(lottery)
+									: developerModalRef.current?.open(lottery)
+							}
 						/>
 					))
 				) : (
@@ -61,13 +80,17 @@ export default function Index() {
 				)}
 			</Stack>
 
-			{isCorrectNetwork && (
-				<>
-					<CreateLotteryModal ref={createLotteryModalRef} />
-					<LotteryModal ref={lotteryModalRef} />
-					<PickWinnerModal ref={pickWinnerModalRef} />
-				</>
-			)}
+			{isCorrectNetwork ? (
+				mode === "User" ? (
+					<>
+						<CreateLotteryModal ref={createLotteryModalRef} />
+						<LotteryModal ref={lotteryModalRef} />
+						<PickWinnerModal ref={pickWinnerModalRef} />
+					</>
+				) : (
+					<DeveloperModal ref={developerModalRef} />
+				)
+			) : null}
 		</>
 	)
 }
