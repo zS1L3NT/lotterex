@@ -1,7 +1,7 @@
 {
 	"name": "sol-truffle-lotterex",
 	"scripts": {
-		"generate": "pnpx typechain --target=truffle-v5 \"../web-next-lotterex/src/contracts/*.json\"",
+		"build": "truffle migrate --reset && pnpx typechain --target=truffle-v5 \"../web-next-lotterex/src/contracts/*.json\"",
 		"test": "truffle test"
 	},
 	"dependencies": {

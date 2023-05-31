@@ -6,7 +6,10 @@ import BN from "bn.js";
 import { EventData, PastEventOptions } from "web3-eth-contract";
 
 export interface LotterexContract extends Truffle.Contract<LotterexInstance> {
-  "new"(meta?: Truffle.TransactionDetails): Promise<LotterexInstance>;
+  "new"(
+    _name: string,
+    meta?: Truffle.TransactionDetails
+  ): Promise<LotterexInstance>;
 }
 
 type AllEvents = never;
@@ -14,14 +17,15 @@ type AllEvents = never;
 export interface LotterexInstance extends Truffle.ContractInstance {
   manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
-  players(
-    arg0: number | BN | string,
-    txDetails?: Truffle.TransactionDetails
-  ): Promise<string>;
+  name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+  getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
   getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
-  pickWinner: {
+  hasEntered(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
+
+  enter: {
     (txDetails?: Truffle.TransactionDetails): Promise<
       Truffle.TransactionResponse<AllEvents>
     >;
@@ -30,21 +34,58 @@ export interface LotterexInstance extends Truffle.ContractInstance {
     estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
   };
 
+  leave: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse<AllEvents>
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
+  pickWinner: {
+    (txDetails?: Truffle.TransactionDetails): Promise<
+      Truffle.TransactionResponse<AllEvents>
+    >;
+    call(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+  };
+
   methods: {
     manager(txDetails?: Truffle.TransactionDetails): Promise<string>;
 
-    players(
-      arg0: number | BN | string,
-      txDetails?: Truffle.TransactionDetails
-    ): Promise<string>;
+    name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+
+    getPlayers(txDetails?: Truffle.TransactionDetails): Promise<string[]>;
 
     getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
+
+    hasEntered(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
+
+    enter: {
+      (txDetails?: Truffle.TransactionDetails): Promise<
+        Truffle.TransactionResponse<AllEvents>
+      >;
+      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+      sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+      estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+    };
+
+    leave: {
+      (txDetails?: Truffle.TransactionDetails): Promise<
+        Truffle.TransactionResponse<AllEvents>
+      >;
+      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+      sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
+      estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
+    };
 
     pickWinner: {
       (txDetails?: Truffle.TransactionDetails): Promise<
         Truffle.TransactionResponse<AllEvents>
       >;
-      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
+      call(txDetails?: Truffle.TransactionDetails): Promise<string>;
       sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
       estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
     };

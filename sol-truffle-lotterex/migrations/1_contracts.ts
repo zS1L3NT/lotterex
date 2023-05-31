@@ -1,3 +1,3 @@
 module.exports = (deployer: Truffle.Deployer) => {
-	deployer.deploy(artifacts.require("Lotterex"))
+	deployer.deploy(artifacts.require("Lotterex"), "testing")
 }
