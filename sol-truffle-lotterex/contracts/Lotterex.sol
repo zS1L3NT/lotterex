@@ -34,7 +34,7 @@ contract Lotterex {
 		return false;
 	}
 
-	function enter() external payable {
+	receive() external payable {
 		require(!hasEntered(), "You have already entered");
 		require(msg.value >= 0.1 ether, "You must send 0.1 ether to enter");
 

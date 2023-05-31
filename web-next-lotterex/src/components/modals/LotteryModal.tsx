@@ -69,8 +69,12 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	const handleEnterLottery = () => {
 		if (web3 && accountId && lottery) {
-			lottery.methods.enter!()
-				.send({ from: accountId, value: web3.utils.toWei(cost.toString(), "ether") })
+			web3.eth
+				.sendTransaction({
+					from: accountId,
+					to: lottery.options.address,
+					value: +web3.utils.toWei(cost.toString(), "ether") + 100_000
+				})
 				.once("receipt", receipt => {
 					setHasEntered(true)
 					close()

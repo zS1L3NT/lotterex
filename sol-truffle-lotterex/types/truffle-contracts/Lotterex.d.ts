@@ -25,15 +25,6 @@ export interface LotterexInstance extends Truffle.ContractInstance {
 
   hasEntered(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
 
-  enter: {
-    (txDetails?: Truffle.TransactionDetails): Promise<
-      Truffle.TransactionResponse<AllEvents>
-    >;
-    call(txDetails?: Truffle.TransactionDetails): Promise<void>;
-    sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
-    estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
-  };
-
   leave: {
     (txDetails?: Truffle.TransactionDetails): Promise<
       Truffle.TransactionResponse<AllEvents>
@@ -62,15 +53,6 @@ export interface LotterexInstance extends Truffle.ContractInstance {
     getBalance(txDetails?: Truffle.TransactionDetails): Promise<BN>;
 
     hasEntered(txDetails?: Truffle.TransactionDetails): Promise<boolean>;
-
-    enter: {
-      (txDetails?: Truffle.TransactionDetails): Promise<
-        Truffle.TransactionResponse<AllEvents>
-      >;
-      call(txDetails?: Truffle.TransactionDetails): Promise<void>;
-      sendTransaction(txDetails?: Truffle.TransactionDetails): Promise<string>;
-      estimateGas(txDetails?: Truffle.TransactionDetails): Promise<number>;
-    };
 
     leave: {
       (txDetails?: Truffle.TransactionDetails): Promise<
