@@ -1,3 +1,4 @@
+import { useRouter } from "next/router"
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
@@ -9,7 +10,7 @@ import { notifications } from "@mantine/notifications"
 import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
-import { useRouter } from "next/router"
+import useLottery from "../../hooks/useLottery"
 
 export type ManagerModalRef = {
 	open: (lottery: AppContract) => void
@@ -17,16 +18,14 @@ export type ManagerModalRef = {
 }
 
 export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModalRef>) {
-	const { web3, accountId } = useContext(WalletContext)
+	const { accountId } = useContext(WalletContext)
 	const router = useRouter()
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [isPickWinnerLoading, setIsPickWinnerLoading] = useState(false)
 	const [isCloseLoading, setIsCloseLoading] = useState(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
-	const [managerId, setManagerId] = useState<string | null>(null)
-	const [balance, setBalance] = useState<number | null>(null)
-	const [players, setPlayers] = useState<string[] | null>(null)
+	const { name, price, balance, players } = useLottery(lottery)
 
 	useImperativeHandle(ref, () => ({
 		open: lottery => {
@@ -40,64 +39,12 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 		close()
 	}, [accountId])
 
-	useEffect(() => {
-		if (web3 && accountId && lottery) {
-			lottery.methods.manager!<string>()
-				.call({ from: accountId })
-				.then(setManagerId)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery manager",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-		}
-	}, [web3, accountId, lottery])
-
-	useEffect(() => {
-		if (web3 && accountId && lottery && managerId === accountId) {
-			lottery.methods.getBalance!<number>()
-				.call({ from: accountId })
-				.then(b => +web3.utils.fromWei(b + ""))
-				.then(setBalance)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery balance",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.getPlayers!<string[]>()
-				.call({ from: accountId })
-				.then(setPlayers)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery players",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-		}
-	}, [web3, accountId, lottery, managerId])
-
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
 			setIsPickWinnerLoading(true)
 			lottery.methods.pickWinner!()
 				.send({ from: accountId, gas: 100_000 })
 				.once("receipt", receipt => {
-					setBalance(0)
-					setPlayers([])
 					close()
 					notifications.show({
 						withCloseButton: true,
@@ -161,9 +108,20 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 			title="Manage Lottery">
 			<Stack>
 				<Box>
+					<Text>Name: </Text>
+					<Text weight={700}>{name}</Text>
+				</Box>
+
+				<Box>
+					<Text>Price: </Text>
+					<Code>{price} ETH</Code>
+				</Box>
+
+				<Box>
 					<Text>Balance: </Text>
 					<Code>{balance} ETH</Code>
 				</Box>
+
 				<Box>
 					<Text>Players:</Text>
 					{players?.length ? (
@@ -178,6 +136,7 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 						<Badge color="red">No Players</Badge>
 					)}
 				</Box>
+
 				<Button
 					variant="light"
 					color="green"

@@ -1,17 +1,15 @@
-import { useRouter } from "next/router"
-import { RefObject, useContext, useEffect, useState } from "react"
+import { RefObject, useContext } from "react"
 import { AppContract } from "web3-eth-contract"
 
 import { Badge, Box, Code, Flex, Paper, Title } from "@mantine/core"
-import { notifications } from "@mantine/notifications"
-import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../contexts/WalletContext"
+import useLottery from "../hooks/useLottery"
 import { DeveloperModalRef } from "./modals/DeveloperModal"
 import { ManagerModalRef } from "./modals/ManagerModal"
 import { UserModalRef } from "./modals/UserModal"
 
-export default function Lottery({
+export default function LotteryComponent({
 	lottery,
 	mode,
 	userModalRef,
@@ -25,69 +23,8 @@ export default function Lottery({
 	developerModalRef: RefObject<DeveloperModalRef>
 }) {
 	const { accountId } = useContext(WalletContext)
-	const router = useRouter()
 
-	const [open, setOpen] = useState<boolean | null>(null)
-	const [name, setName] = useState<string | null>(null)
-	const [managerId, setManagerId] = useState<string | null>(null)
-	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
-
-	useEffect(() => {
-		if (accountId) {
-			lottery.methods.open!<boolean>()
-				.call({ from: accountId })
-				.then(setOpen)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery price",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.name!<string>()
-				.call({ from: accountId })
-				.then(setName)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery name",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.manager!<string>()
-				.call({ from: accountId })
-				.then(setManagerId)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery manager",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.hasEntered!<boolean>()
-				.call({ from: accountId })
-				.then(setHasEntered)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery manager",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-		}
-	}, [router, accountId])
+	const { open, name, managerId, hasEntered } = useLottery(lottery)
 
 	return (
 		<Paper
@@ -95,7 +32,7 @@ export default function Lottery({
 				cursor: open || mode === "Developer" ? "pointer" : "not-allowed",
 				transition: "box-shadow 0.2s ease",
 				":hover": {
-					boxShadow: theme.shadows.sm
+					boxShadow: open || mode === "Developer" ? theme.shadows.sm : theme.shadows.xs
 				}
 			})}
 			shadow="xs"

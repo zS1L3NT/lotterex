@@ -10,6 +10,7 @@ import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 import { useRouter } from "next/router"
+import useLottery from "../../hooks/useLottery"
 
 export type UserModalRef = {
 	open: (lottery: AppContract) => void
@@ -23,9 +24,7 @@ export default forwardRef(function UserModal(_, ref: ForwardedRef<UserModalRef>)
 	const [opened, { open, close }] = useDisclosure(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
-	const [name, setName] = useState<string | null>(null)
-	const [price, setPrice] = useState<number | null>(null)
-	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
+	const { name, price, hasEntered } = useLottery(lottery)
 
 	useImperativeHandle(ref, () => ({
 		open: lottery => {
@@ -39,51 +38,6 @@ export default forwardRef(function UserModal(_, ref: ForwardedRef<UserModalRef>)
 		close()
 	}, [accountId])
 
-	useEffect(() => {
-		if (accountId && lottery) {
-			lottery.methods.name!<string>()
-				.call()
-				.then(setName)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery name",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.price!<number>()
-				.call()
-				.then(v => +web3!.utils.fromWei(v + ""))
-				.then(setPrice)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery price",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.hasEntered!<boolean>()
-				.call({ from: accountId })
-				.then(setHasEntered)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery entry status",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-		}
-	}, [accountId, lottery])
-
 	const handleEnterLottery = () => {
 		if (web3 && accountId && lottery && price) {
 			setIsLoading(true)
@@ -94,7 +48,6 @@ export default forwardRef(function UserModal(_, ref: ForwardedRef<UserModalRef>)
 					value: +web3.utils.toWei(price + "", "ether") + 100_000
 				})
 				.once("receipt", receipt => {
-					setHasEntered(true)
 					close()
 					notifications.show({
 						withCloseButton: true,
@@ -126,7 +79,6 @@ export default forwardRef(function UserModal(_, ref: ForwardedRef<UserModalRef>)
 			lottery.methods.leave!()
 				.send({ from: accountId })
 				.once("receipt", receipt => {
-					setHasEntered(false)
 					close()
 					notifications.show({
 						withCloseButton: true,
