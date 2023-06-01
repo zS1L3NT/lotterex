@@ -22,10 +22,12 @@ The NextJS project containing the UI to interact with the smart contract
 
 -   Create Lottery
     -   Lottery Name
+    -   Lottery Price
 -   Enter Lottery
 -   Leave Lottery
--   Pick winner for Lottery
-    -   Only for manager
+-   Lottery Manager Controls
+    -   Pick random winner for Lottery
+    -   Close Lottery
 -   Developer page to call smart contract functions directly
 
 ## Usage
