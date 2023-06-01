@@ -19,7 +19,9 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
+	const [isLoading, setIsLoading] = useState(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
+	const [managerId, setManagerId] = useState<string | null>(null)
 	const [balance, setBalance] = useState<number | null>(null)
 	const [players, setPlayers] = useState<string[] | null>(null)
 
@@ -39,42 +41,12 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 		if (web3 && accountId && lottery) {
 			lottery.methods.manager!<string>()
 				.call({ from: accountId })
-				.then(managerId => {
-					if (managerId === accountId) {
-						lottery.methods.getBalance!<number>()
-							.call({ from: accountId })
-							.then(b => +web3.utils.fromWei(b + ""))
-							.then(setBalance)
-							.catch(error => {
-								notifications.show({
-									withCloseButton: true,
-									autoClose: false,
-									title: "Error getting lottery balance",
-									message: error.message,
-									color: "red",
-									icon: <IconX />
-								})
-							})
-						lottery.methods.getPlayers!<string[]>()
-							.call({ from: accountId })
-							.then(setPlayers)
-							.catch(error => {
-								notifications.show({
-									withCloseButton: true,
-									autoClose: false,
-									title: "Error getting lottery players",
-									message: error.message,
-									color: "red",
-									icon: <IconX />
-								})
-							})
-					}
-				})
+				.then(setManagerId)
 				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
 						autoClose: false,
-						title: "Error entering lottery",
+						title: "Error getting lottery manager",
 						message: error.message,
 						color: "red",
 						icon: <IconX />
@@ -83,8 +55,41 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 		}
 	}, [web3, accountId, lottery])
 
+	useEffect(() => {
+		if (web3 && accountId && lottery && managerId === accountId) {
+			lottery.methods.getBalance!<number>()
+				.call({ from: accountId })
+				.then(b => +web3.utils.fromWei(b + ""))
+				.then(setBalance)
+				.catch(error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery balance",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+			lottery.methods.getPlayers!<string[]>()
+				.call({ from: accountId })
+				.then(setPlayers)
+				.catch(error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery players",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+		}
+	}, [web3, accountId, lottery, managerId])
+
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
+			setIsLoading(true)
 			lottery.methods.pickWinner!()
 				.send({ from: accountId, gas: 100_000 })
 				.once("receipt", receipt => {
@@ -110,6 +115,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 						icon: <IconX />
 					})
 				})
+				.finally(() => setIsLoading(false))
 		}
 	}
 
@@ -142,6 +148,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 					variant="light"
 					color="red"
 					onClick={handlePickWinner}
+					loading={isLoading}
 					disabled={!players || players.length < 3}>
 					Pick Winner
 				</Button>

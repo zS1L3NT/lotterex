@@ -19,6 +19,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
+	const [isLoading, setIsLoading] = useState(false)
 	const [name, setName] = useState("")
 	const [price, setPrice] = useState(0.1)
 
@@ -26,6 +27,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 
 	const handleCreate = async () => {
 		if (web3 && accountId) {
+			setIsLoading(true)
 			new web3.eth.Contract(LotterexArtifact.abi as any)
 				.deploy({
 					data: LotterexArtifact.bytecode,
@@ -59,6 +61,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 						icon: <IconX />
 					})
 				})
+				.finally(() => setIsLoading(false))
 		}
 	}
 
@@ -87,6 +90,7 @@ export default forwardRef(function CreateLotteryModal(_, ref: ForwardedRef<Creat
 					variant="light"
 					color="green"
 					onClick={handleCreate}
+					loading={isLoading}
 					disabled={!name}>
 					Create
 				</Button>

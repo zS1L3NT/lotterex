@@ -26,12 +26,14 @@ function Method({
 }) {
 	const { web3, accountId } = useContext(WalletContext)
 
+	const [isLoading, setIsLoading] = useState(false)
 	const [amount, setAmount] = useState(0)
 	const [data, setData] = useState<any>(null)
 	const [error, setError] = useState<Error | null>(null)
 
 	const handleClick = () => {
 		if (web3 && accountId && lottery) {
+			setIsLoading(true)
 			if (method.stateMutability === "view") {
 				lottery.methods[method.name!]!()
 					.call({ from: accountId })
@@ -44,6 +46,7 @@ function Method({
 						setData(null)
 						setError(error)
 					})
+					.finally(() => setIsLoading(false))
 			} else if (method.type === "receive") {
 				web3.eth
 					.sendTransaction({
@@ -61,6 +64,7 @@ function Method({
 						setAmount(0)
 						setError(error)
 					})
+					.finally(() => setIsLoading(false))
 			} else {
 				lottery.methods[method.name!]!()
 					.send({ from: accountId })
@@ -72,6 +76,7 @@ function Method({
 						setData(null)
 						setError(error)
 					})
+					.finally(() => setIsLoading(false))
 			}
 		}
 	}
@@ -115,7 +120,8 @@ function Method({
 							? "red"
 							: "yellow"
 					}
-					onClick={handleClick}>
+					onClick={handleClick}
+					loading={isLoading}>
 					{method.name ?? "send"}
 				</Button>
 			</Flex>

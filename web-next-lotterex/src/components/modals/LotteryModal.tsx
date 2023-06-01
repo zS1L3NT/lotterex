@@ -19,6 +19,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
+	const [isLoading, setIsLoading] = useState(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
 	const [name, setName] = useState<string | null>(null)
 	const [price, setPrice] = useState<number | null>(null)
@@ -83,6 +84,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 
 	const handleEnterLottery = () => {
 		if (web3 && accountId && lottery && price) {
+			setIsLoading(true)
 			web3.eth
 				.sendTransaction({
 					from: accountId,
@@ -111,11 +113,13 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						icon: <IconX />
 					})
 				})
+				.finally(() => setIsLoading(false))
 		}
 	}
 
 	const handleLeaveLottery = () => {
 		if (web3 && accountId && lottery) {
+			setIsLoading(true)
 			lottery.methods.leave!()
 				.send({ from: accountId })
 				.once("receipt", receipt => {
@@ -140,6 +144,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						icon: <IconX />
 					})
 				})
+				.finally(() => setIsLoading(false))
 		}
 	}
 
@@ -165,6 +170,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						variant="light"
 						color="green"
 						onClick={handleEnterLottery}
+						loading={isLoading}
 						disabled={hasEntered === null || hasEntered}>
 						Enter Lottery
 					</Button>
@@ -172,7 +178,8 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 					<Button
 						variant="light"
 						color="red"
-						onClick={handleLeaveLottery}>
+						onClick={handleLeaveLottery}
+						loading={isLoading}>
 						Leave Lottery
 					</Button>
 				)}
