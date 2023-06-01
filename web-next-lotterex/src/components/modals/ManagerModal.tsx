@@ -126,7 +126,7 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 		if (accountId && lottery) {
 			setIsCloseLoading(true)
 			lottery.methods.close!()
-				.send({ from: accountId, gas: 100_000 })
+				.send({ from: accountId, gas: 150_000 })
 				.once("receipt", receipt => {
 					close()
 					notifications.show({
