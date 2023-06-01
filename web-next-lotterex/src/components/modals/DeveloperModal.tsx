@@ -156,7 +156,7 @@ export default forwardRef(function DeveloperModal(_, ref: ForwardedRef<Developer
 			onClose={close}
 			centered
 			size="lg"
-			title="Developer"
+			title="Developer Mode"
 			scrollAreaComponent={ScrollArea.Autosize}>
 			<Stack>
 				{LotterexArtifact.abi

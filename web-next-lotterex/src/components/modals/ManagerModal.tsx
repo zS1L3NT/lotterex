@@ -10,12 +10,12 @@ import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
 
-export type PickWinnerModalRef = {
+export type ManagerModalRef = {
 	open: (lottery: AppContract) => void
 	close: () => void
 }
 
-export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinnerModalRef>) {
+export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModalRef>) {
 	const { web3, accountId } = useContext(WalletContext)
 
 	const [opened, { open, close }] = useDisclosure(false)
@@ -124,7 +124,7 @@ export default forwardRef(function PickWinnerModal(_, ref: ForwardedRef<PickWinn
 			opened={opened}
 			onClose={close}
 			centered
-			title="Pick Winner">
+			title="Manage Lottery">
 			<Stack>
 				<Box>
 					<Text>Balance: </Text>

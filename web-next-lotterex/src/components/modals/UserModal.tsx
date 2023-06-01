@@ -11,12 +11,12 @@ import { IconCheck, IconX } from "@tabler/icons-react"
 import WalletContext from "../../contexts/WalletContext"
 import { useRouter } from "next/router"
 
-export type LotteryModalRef = {
+export type UserModalRef = {
 	open: (lottery: AppContract) => void
 	close: () => void
 }
 
-export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModalRef>) {
+export default forwardRef(function UserModal(_, ref: ForwardedRef<UserModalRef>) {
 	const { web3, accountId } = useContext(WalletContext)
 	const router = useRouter()
 

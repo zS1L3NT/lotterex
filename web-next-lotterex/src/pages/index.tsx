@@ -9,8 +9,8 @@ import { IconAlertTriangle, IconPlus } from "@tabler/icons-react"
 import Lottery from "../components/Lottery"
 import CreateLotteryModal, { CreateLotteryModalRef } from "../components/modals/CreateLotteryModal"
 import DeveloperModal, { DeveloperModalRef } from "../components/modals/DeveloperModal"
-import LotteryModal, { LotteryModalRef } from "../components/modals/LotteryModal"
-import PickWinnerModal, { PickWinnerModalRef } from "../components/modals/PickWinnerModal"
+import ManagerModal, { ManagerModalRef } from "../components/modals/ManagerModal"
+import UserModal, { UserModalRef } from "../components/modals/UserModal"
 import LotteriesContext from "../contexts/LotteriesContext"
 import WalletContext from "../contexts/WalletContext"
 import LotteriesArtifact from "../contracts/Lotterex.json"
@@ -24,8 +24,8 @@ export default function Index() {
 
 	const [mode, setMode] = useState<"Developer" | "User">("User")
 	const createLotteryModalRef = useRef<CreateLotteryModalRef>(null)
-	const lotteryModalRef = useRef<LotteryModalRef>(null)
-	const pickWinnerModalRef = useRef<PickWinnerModalRef>(null)
+	const userModalRef = useRef<UserModalRef>(null)
+	const managerModalRef = useRef<ManagerModalRef>(null)
 	const developerModalRef = useRef<DeveloperModalRef>(null)
 
 	const isCorrectNetwork = networkId + "" in LotteriesArtifact.networks
@@ -57,18 +57,7 @@ export default function Index() {
 					lotteries.map(lottery => (
 						<Lottery
 							key={lottery.options.address}
-							lottery={lottery}
-							mode={mode}
-							onPickWinner={() =>
-								mode === "User"
-									? pickWinnerModalRef.current?.open(lottery)
-									: developerModalRef.current?.open(lottery)
-							}
-							onEnterLottery={() =>
-								mode === "User"
-									? lotteryModalRef.current?.open(lottery)
-									: developerModalRef.current?.open(lottery)
-							}
+							{...{ lottery, mode, userModalRef, managerModalRef, developerModalRef }}
 						/>
 					))
 				) : (
@@ -85,8 +74,8 @@ export default function Index() {
 				mode === "User" ? (
 					<>
 						<CreateLotteryModal ref={createLotteryModalRef} />
-						<LotteryModal ref={lotteryModalRef} />
-						<PickWinnerModal ref={pickWinnerModalRef} />
+						<UserModal ref={userModalRef} />
+						<ManagerModal ref={managerModalRef} />
 					</>
 				) : (
 					<DeveloperModal ref={developerModalRef} />

@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from "react"
+import { useRouter } from "next/router"
+import { RefObject, useContext, useEffect, useState } from "react"
 import { AppContract } from "web3-eth-contract"
 
 import { Badge, Box, Code, Flex, Paper, Title } from "@mantine/core"
@@ -6,18 +7,22 @@ import { notifications } from "@mantine/notifications"
 import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../contexts/WalletContext"
-import { useRouter } from "next/router"
+import { DeveloperModalRef } from "./modals/DeveloperModal"
+import { ManagerModalRef } from "./modals/ManagerModal"
+import { UserModalRef } from "./modals/UserModal"
 
 export default function Lottery({
 	lottery,
 	mode,
-	onPickWinner,
-	onEnterLottery
+	userModalRef,
+	managerModalRef,
+	developerModalRef
 }: {
 	lottery: AppContract
 	mode: "User" | "Developer"
-	onPickWinner: () => void
-	onEnterLottery: () => void
+	userModalRef: RefObject<UserModalRef>
+	managerModalRef: RefObject<ManagerModalRef>
+	developerModalRef: RefObject<DeveloperModalRef>
 }) {
 	const { accountId } = useContext(WalletContext)
 	const router = useRouter()
@@ -101,10 +106,12 @@ export default function Lottery({
 			shadow="xs"
 			p="md"
 			onClick={() =>
-				open || mode === "Developer"
+				mode === "Developer"
+					? developerModalRef.current?.open(lottery)
+					: open
 					? managerId === accountId
-						? onPickWinner()
-						: onEnterLottery()
+						? managerModalRef.current?.open(lottery)
+						: userModalRef.current?.open(lottery)
 					: null
 			}>
 			<Box>
