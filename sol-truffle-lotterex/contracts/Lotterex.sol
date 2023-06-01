@@ -9,6 +9,9 @@ contract Lotterex {
 	address[] private players;
 
 	constructor(string memory _name, uint256 _price) {
+		require(bytes(_name).length > 0, "The name must not be empty");
+		require(_price > 0.00001 ether, "The price must be greater than 0.00001 ether");
+		
 		open = true;
 		name = _name;
 		price = _price;
