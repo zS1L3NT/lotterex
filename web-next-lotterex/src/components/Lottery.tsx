@@ -73,11 +73,6 @@ export default function Lottery({
 						icon: <IconX />
 					})
 				})
-		}
-	}, [router, accountId])
-
-	useEffect(() => {
-		if (accountId && open) {
 			lottery.methods.hasEntered!<boolean>()
 				.call({ from: accountId })
 				.then(setHasEntered)
@@ -92,7 +87,7 @@ export default function Lottery({
 					})
 				})
 		}
-	}, [router, accountId, open])
+	}, [router, accountId])
 
 	return (
 		<Paper

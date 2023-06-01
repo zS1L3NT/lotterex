@@ -28,15 +28,15 @@ contract Lotterex {
 		_;
 	}
 
-	function getPlayers() isOpen onlyManager external view returns (address[] memory) {
+	function getPlayers() onlyManager external view returns (address[] memory) {
 		return players;
 	}
 
-	function getBalance() isOpen onlyManager external view returns (uint256) {
+	function getBalance() onlyManager external view returns (uint256) {
 		return address(this).balance;
 	}
 
-	function hasEntered() isOpen public view returns (bool) {
+	function hasEntered() public view returns (bool) {
 		for (uint256 i = 0; i < players.length; i++) {
 			if (players[i] == msg.sender) {
 				return true;
