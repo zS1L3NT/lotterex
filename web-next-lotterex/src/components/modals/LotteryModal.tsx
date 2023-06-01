@@ -3,7 +3,7 @@ import {
 } from "react"
 import { AppContract } from "web3-eth-contract"
 
-import { Box, Button, Code, Modal, NumberInput, Stack, Text } from "@mantine/core"
+import { Box, Button, Code, Modal, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { IconCheck, IconX } from "@tabler/icons-react"
@@ -21,8 +21,8 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 	const [opened, { open, close }] = useDisclosure(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
 	const [name, setName] = useState<string | null>(null)
+	const [price, setPrice] = useState<number | null>(null)
 	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
-	const [cost, setCost] = useState<number>(0.1)
 
 	useImperativeHandle(ref, () => ({
 		open: lottery => {
@@ -51,6 +51,20 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						icon: <IconX />
 					})
 				})
+			lottery.methods.price!<number>()
+				.call()
+				.then(v => +web3!.utils.fromWei(v + ""))
+				.then(setPrice)
+				.catch(error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery price",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 			lottery.methods.hasEntered!<boolean>()
 				.call({ from: accountId })
 				.then(setHasEntered)
@@ -68,16 +82,15 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 	}, [accountId, lottery])
 
 	const handleEnterLottery = () => {
-		if (web3 && accountId && lottery) {
+		if (web3 && accountId && lottery && price) {
 			web3.eth
 				.sendTransaction({
 					from: accountId,
 					to: lottery.options.address,
-					value: +web3.utils.toWei(cost.toString(), "ether") + 100_000
+					value: +web3.utils.toWei(price + "", "ether") + 100_000
 				})
 				.once("receipt", receipt => {
 					setHasEntered(true)
-					setCost(0.1)
 					close()
 					notifications.show({
 						withCloseButton: true,
@@ -142,25 +155,19 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 					<Text weight={700}>{name}</Text>
 				</Box>
 
-				{!hasEntered ? (
-					<>
-						<NumberInput
-							label="Cost in ETH"
-							description="Must be 0.1 ETH"
-							precision={2}
-							hideControls
-							value={cost}
-							onChange={e => setCost(e || 0)}
-						/>
+				<Box>
+					<Text>Price:</Text>
+					<Text weight={700}>{price} ETH</Text>
+				</Box>
 
-						<Button
-							variant="light"
-							color="green"
-							onClick={handleEnterLottery}
-							disabled={hasEntered === null || hasEntered}>
-							Enter Lottery
-						</Button>
-					</>
+				{!hasEntered ? (
+					<Button
+						variant="light"
+						color="green"
+						onClick={handleEnterLottery}
+						disabled={hasEntered === null || hasEntered}>
+						Enter Lottery
+					</Button>
 				) : (
 					<Button
 						variant="light"

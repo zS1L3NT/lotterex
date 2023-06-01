@@ -58,6 +58,7 @@ export default function Index() {
 						<Lottery
 							key={lottery.options.address}
 							lottery={lottery}
+							mode={mode}
 							onPickWinner={() =>
 								mode === "User"
 									? pickWinnerModalRef.current?.open(lottery)

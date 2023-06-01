@@ -9,21 +9,37 @@ import WalletContext from "../contexts/WalletContext"
 
 export default function Lottery({
 	lottery,
+	mode,
 	onPickWinner,
 	onEnterLottery
 }: {
 	lottery: AppContract
+	mode: "User" | "Developer"
 	onPickWinner: () => void
 	onEnterLottery: () => void
 }) {
 	const { accountId } = useContext(WalletContext)
 
+	const [open, setOpen] = useState<boolean | null>(null)
 	const [name, setName] = useState<string | null>(null)
 	const [managerId, setManagerId] = useState<string | null>(null)
 	const [hasEntered, setHasEntered] = useState<boolean | null>(null)
 
 	useEffect(() => {
 		if (accountId) {
+			lottery.methods.open!<boolean>()
+				.call({ from: accountId })
+				.then(setOpen)
+				.catch(error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error getting lottery price",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
 			lottery.methods.name!<string>()
 				.call({ from: accountId })
 				.then(setName)
@@ -50,6 +66,11 @@ export default function Lottery({
 						icon: <IconX />
 					})
 				})
+		}
+	}, [accountId])
+
+	useEffect(() => {
+		if (accountId && open) {
 			lottery.methods.hasEntered!<boolean>()
 				.call({ from: accountId })
 				.then(setHasEntered)
@@ -64,12 +85,12 @@ export default function Lottery({
 					})
 				})
 		}
-	}, [accountId])
+	}, [accountId, open])
 
 	return (
 		<Paper
 			sx={theme => ({
-				cursor: "pointer",
+				cursor: open || mode === "Developer" ? "pointer" : "not-allowed",
 				transition: "box-shadow 0.2s ease",
 				":hover": {
 					boxShadow: theme.shadows.sm
@@ -77,13 +98,20 @@ export default function Lottery({
 			})}
 			shadow="xs"
 			p="md"
-			onClick={() => (managerId === accountId ? onPickWinner() : onEnterLottery())}>
+			onClick={() =>
+				open || mode === "Developer"
+					? managerId === accountId
+						? onPickWinner()
+						: onEnterLottery()
+					: null
+			}>
 			<Box>
 				<Flex
 					gap="0.5rem"
 					align="center">
 					<Title order={3}>{name}</Title>
-					{managerId === accountId && <Badge color="red">OWNER</Badge>}
+					{!open && <Badge color="red">CLOSED</Badge>}
+					{managerId === accountId && <Badge color="green">OWNER</Badge>}
 					{hasEntered && <Badge color="yellow">ENTERED</Badge>}
 				</Flex>
 				<Code>{lottery.options.address}</Code>
