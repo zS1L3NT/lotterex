@@ -6,6 +6,7 @@ import { notifications } from "@mantine/notifications"
 import { IconX } from "@tabler/icons-react"
 
 import WalletContext from "../contexts/WalletContext"
+import { useRouter } from "next/router"
 
 export default function Lottery({
 	lottery,
@@ -19,6 +20,7 @@ export default function Lottery({
 	onEnterLottery: () => void
 }) {
 	const { accountId } = useContext(WalletContext)
+	const router = useRouter()
 
 	const [open, setOpen] = useState<boolean | null>(null)
 	const [name, setName] = useState<string | null>(null)
@@ -67,7 +69,7 @@ export default function Lottery({
 					})
 				})
 		}
-	}, [accountId])
+	}, [router, accountId])
 
 	useEffect(() => {
 		if (accountId && open) {
@@ -85,7 +87,7 @@ export default function Lottery({
 					})
 				})
 		}
-	}, [accountId, open])
+	}, [router, accountId, open])
 
 	return (
 		<Paper

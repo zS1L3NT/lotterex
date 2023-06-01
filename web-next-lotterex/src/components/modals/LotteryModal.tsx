@@ -9,6 +9,7 @@ import { notifications } from "@mantine/notifications"
 import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
+import { useRouter } from "next/router"
 
 export type LotteryModalRef = {
 	open: (lottery: AppContract) => void
@@ -17,6 +18,7 @@ export type LotteryModalRef = {
 
 export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModalRef>) {
 	const { web3, accountId } = useContext(WalletContext)
+	const router = useRouter()
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [isLoading, setIsLoading] = useState(false)
@@ -102,6 +104,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						color: "green",
 						icon: <IconCheck />
 					})
+					router.push(router.asPath)
 				})
 				.on("error", error => {
 					notifications.show({
@@ -133,6 +136,7 @@ export default forwardRef(function LotteryModal(_, ref: ForwardedRef<LotteryModa
 						color: "green",
 						icon: <IconCheck />
 					})
+					router.push(router.asPath)
 				})
 				.on("error", error => {
 					notifications.show({
