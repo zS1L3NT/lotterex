@@ -9,6 +9,7 @@ import { notifications } from "@mantine/notifications"
 import { IconCheck, IconX } from "@tabler/icons-react"
 
 import WalletContext from "../../contexts/WalletContext"
+import { useRouter } from "next/router"
 
 export type ManagerModalRef = {
 	open: (lottery: AppContract) => void
@@ -17,9 +18,11 @@ export type ManagerModalRef = {
 
 export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModalRef>) {
 	const { web3, accountId } = useContext(WalletContext)
+	const router = useRouter()
 
 	const [opened, { open, close }] = useDisclosure(false)
-	const [isLoading, setIsLoading] = useState(false)
+	const [isPickWinnerLoading, setIsPickWinnerLoading] = useState(false)
+	const [isCloseLoading, setIsCloseLoading] = useState(false)
 	const [lottery, setLottery] = useState<AppContract | null>(null)
 	const [managerId, setManagerId] = useState<string | null>(null)
 	const [balance, setBalance] = useState<number | null>(null)
@@ -89,7 +92,7 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 
 	const handlePickWinner = () => {
 		if (accountId && lottery) {
-			setIsLoading(true)
+			setIsPickWinnerLoading(true)
 			lottery.methods.pickWinner!()
 				.send({ from: accountId, gas: 100_000 })
 				.once("receipt", receipt => {
@@ -115,7 +118,38 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 						icon: <IconX />
 					})
 				})
-				.finally(() => setIsLoading(false))
+				.finally(() => setIsPickWinnerLoading(false))
+		}
+	}
+
+	const handleClose = () => {
+		if (accountId && lottery) {
+			setIsCloseLoading(true)
+			lottery.methods.close!()
+				.send({ from: accountId, gas: 100_000 })
+				.once("receipt", receipt => {
+					close()
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Closed Lottery",
+						message: <Code>{receipt.transactionHash}</Code>,
+						color: "green",
+						icon: <IconCheck />
+					})
+					router.push(router.asPath)
+				})
+				.on("error", error => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error closing lottery",
+						message: error.message,
+						color: "red",
+						icon: <IconX />
+					})
+				})
+				.finally(() => setIsCloseLoading(false))
 		}
 	}
 
@@ -146,11 +180,18 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 				</Box>
 				<Button
 					variant="light"
-					color="red"
+					color="green"
 					onClick={handlePickWinner}
-					loading={isLoading}
+					loading={isPickWinnerLoading}
 					disabled={!players || players.length < 3}>
 					Pick Winner
+				</Button>
+				<Button
+					variant="light"
+					color="red"
+					onClick={handleClose}
+					loading={isCloseLoading}>
+					Close Lottery
 				</Button>
 			</Stack>
 		</Modal>
