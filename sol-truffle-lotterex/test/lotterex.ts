@@ -1,5 +1,3 @@
-
-
 const Lotterex = artifacts.require("Lotterex")
 
 const ether = (ether: number | string) => web3.utils.toBN(web3.utils.toWei(ether + "", "ether"))

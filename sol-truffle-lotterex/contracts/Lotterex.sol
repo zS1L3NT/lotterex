@@ -84,6 +84,7 @@ contract Lotterex {
 			payable(players[i]).transfer(price);
 		}
 
+		players = new address[](0);
 		open = false;
 	}
 
