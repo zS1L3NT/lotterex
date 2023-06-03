@@ -1,4 +1,3 @@
-import { useRouter } from "next/router"
 import {
 	ForwardedRef, forwardRef, useContext, useEffect, useImperativeHandle, useState
 } from "react"
@@ -19,7 +18,6 @@ export type ManagerModalRef = {
 
 export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModalRef>) {
 	const { accountId } = useContext(WalletContext)
-	const router = useRouter()
 
 	const [opened, { open, close }] = useDisclosure(false)
 	const [isPickWinnerLoading, setIsPickWinnerLoading] = useState(false)
@@ -84,7 +82,6 @@ export default forwardRef(function ManagerModal(_, ref: ForwardedRef<ManagerModa
 						color: "green",
 						icon: <IconCheck />
 					})
-					router.push(router.asPath)
 				})
 				.on("error", error => {
 					notifications.show({

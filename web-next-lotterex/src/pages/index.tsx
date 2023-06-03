@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 
 import {
 	ActionIcon, Alert, Flex, SegmentedControl, Stack, Title, useMantineTheme

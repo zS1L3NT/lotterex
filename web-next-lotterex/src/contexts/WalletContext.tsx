@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { notifications } from "@mantine/notifications"
+import { IconX } from "@tabler/icons-react"
+import { useRouter } from "next/router"
 import { createContext, PropsWithChildren, useEffect, useState } from "react"
 import Web3 from "web3"
 
@@ -10,6 +13,8 @@ const WalletContext = createContext({
 
 export default WalletContext
 export const WalletProvider = ({ children }: PropsWithChildren) => {
+	const router = useRouter()
+
 	const [web3, setWeb3] = useState<Web3 | null>(null)
 	const [networkId, setNetworkId] = useState<number | null>(null)
 	const [accountId, setAccountId] = useState<string | null>(null)
@@ -25,6 +30,29 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
 			window.ethereum.removeListener("accountsChanged", updateWallet)
 		}
 	}, [])
+
+	useEffect(() => {
+		if (web3) {
+			const subscription = web3.eth.subscribe("newBlockHeaders")
+				.on("data", () => router.push(router.asPath))
+				.on("error", () => {
+					notifications.show({
+						withCloseButton: true,
+						autoClose: false,
+						title: "Error subscribing to new blocks",
+						message: "Please refresh the page",
+						color: "red",
+						icon: <IconX />
+					})
+				})
+			
+			return () => {
+				subscription.unsubscribe()
+			}
+		}
+
+		return
+	}, [web3])
 
 	const updateWallet = async () => {
 		const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
