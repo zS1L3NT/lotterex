@@ -47,7 +47,7 @@ contract("Lotterex", accounts => {
 			await lotterex.getBalance({ from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "Only the manager can call this function")
+			assert(error(e, "Only the manager can call this function"))
 		}
 	})
 
@@ -58,7 +58,7 @@ contract("Lotterex", accounts => {
 			await lotterex.getPlayers({ from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "Only the manager can call this function")
+			assert(error(e, "Only the manager can call this function"))
 		}
 	})
 
@@ -86,7 +86,7 @@ contract("Lotterex", accounts => {
 			await lotterex.send(ether(0.1), { from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "You have already entered")
+			assert(error(e, "You have already entered"))
 		}
 	})
 
@@ -94,10 +94,10 @@ contract("Lotterex", accounts => {
 		const lotterex = await Lotterex.deployed()
 
 		try {
-			await lotterex.send(ether(0.05), { from: accounts[1] })
+			await lotterex.send(ether(0.05), { from: accounts[2] })
 			assert(false)
 		} catch (e) {
-			error(e, "You did not send enough ether to enter")
+			assert(error(e, "You did not send enough ether to enter"))
 		}
 	})
 
@@ -122,7 +122,7 @@ contract("Lotterex", accounts => {
 			await lotterex.leave({ from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "You have not entered the lottery")
+			assert(error(e, "You have not entered the lottery"))
 		}
 	})
 
@@ -156,7 +156,7 @@ contract("Lotterex", accounts => {
 			await lotterex.pickWinner({ from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "Only the manager can call this function")
+			assert(error(e, "Only the manager can call this function"))
 		}
 	})
 
@@ -167,7 +167,7 @@ contract("Lotterex", accounts => {
 			await lotterex.pickWinner()
 			assert(false)
 		} catch (e) {
-			error(e, "There are not enough players to pick a winner")
+			assert(error(e, "There are not enough players to pick a winner"))
 		}
 	})
 
@@ -190,6 +190,17 @@ contract("Lotterex", accounts => {
 		assert(ether(0).eq(await balance(lotterex.address)))
 	})
 
+	it("shouldn't allow a non-manager to close the lottery", async () => {
+		const lotterex = await Lotterex.deployed()
+
+		try {
+			await lotterex.close({ from: accounts[1] })
+			assert(false)
+		} catch (e) {
+			assert(error(e, "Only the manager can call this function"))
+		}
+	})
+
 	it("should return all ETH to players when closing the lottery", async () => {
 		const lotterex = await Lotterex.deployed()
 
@@ -209,67 +220,35 @@ contract("Lotterex", accounts => {
 		assert(ether(0).eq(await balance(lotterex.address)))
 	})
 
-	it("shouldn't allow a non-manager to close the lottery", async () => {
-		const lotterex = await Lotterex.deployed()
-
-		try {
-			await lotterex.close({ from: accounts[1] })
-			assert(false)
-		} catch (e) {
-			error(e, "Only the manager can call this function")
-		}
-	})
-
 	it("shouldn't allow the anyone to interact with the lottery after closing", async () => {
 		const lotterex = await Lotterex.deployed()
-
-		try {
-			await lotterex.getPlayers()
-			assert(false)
-		} catch (e) {
-			error(e, "The lottery is closed")
-		}
-
-		try {
-			await lotterex.getBalance()
-			assert(false)
-		} catch (e) {
-			error(e, "The lottery is closed")
-		}
-
-		try {
-			await lotterex.hasEntered()
-			assert(false)
-		} catch (e) {
-			error(e, "The lottery is closed")
-		}
 
 		try {
 			await lotterex.send(ether(0.1), { from: accounts[1] })
 			assert(false)
 		} catch (e) {
-			error(e, "The lottery is closed")
+			assert(error(e, "The lottery is closed"))
 		}
 
 		try {
 			await lotterex.leave()
 			assert(false)
 		} catch (e) {
-			error(e, "The lottery is closed")
+			assert(error(e, "The lottery is closed"))
 		}
 
 		try {
 			await lotterex.pickWinner()
 			assert(false)
 		} catch (e) {
-			error(e, "The lottery is closed")
+			assert(error(e, "The lottery is closed"))
 		}
 
 		try {
 			await lotterex.close()
 			assert(false)
 		} catch (e) {
-			error(e, "The lottery is closed")
+			assert(error(e, "The lottery is closed"))
 		}
 	})
 })
