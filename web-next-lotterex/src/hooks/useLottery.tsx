@@ -47,7 +47,39 @@ const useLottery = (lottery: AppContract | null) => {
 				})
 			lottery.methods.manager!<string>()
 				.call({ from: accountId })
-				.then(setManagerId)
+				.then(managerId => {
+					setManagerId(managerId)
+
+					if (managerId === accountId) {
+						lottery.methods.getPlayers!<string[]>()
+							.call({ from: accountId })
+							.then(setPlayers)
+							.catch(error => {
+								notifications.show({
+									withCloseButton: true,
+									autoClose: false,
+									title: "Error getting lottery players",
+									message: error.message,
+									color: "red",
+									icon: <IconX />
+								})
+							})
+						lottery.methods.getBalance!<number>()
+							.call({ from: accountId })
+							.then(b => +web3.utils.fromWei(b + ""))
+							.then(setBalance)
+							.catch(error => {
+								notifications.show({
+									withCloseButton: true,
+									autoClose: false,
+									title: "Error getting lottery balance",
+									message: error.message,
+									color: "red",
+									icon: <IconX />
+								})
+							})
+					}
+				})
 				.catch(error => {
 					notifications.show({
 						withCloseButton: true,
@@ -87,38 +119,6 @@ const useLottery = (lottery: AppContract | null) => {
 				})
 			}
 	}, [router, lottery, web3, accountId])
-
-	useEffect(() => {
-		if (lottery && web3 && accountId && managerId === accountId) {
-			lottery.methods.getPlayers!<string[]>()
-				.call({ from: accountId })
-				.then(setPlayers)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery players",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-			lottery.methods.getBalance!<number>()
-				.call({ from: accountId })
-				.then(b => +web3.utils.fromWei(b + ""))
-				.then(setBalance)
-				.catch(error => {
-					notifications.show({
-						withCloseButton: true,
-						autoClose: false,
-						title: "Error getting lottery balance",
-						message: error.message,
-						color: "red",
-						icon: <IconX />
-					})
-				})
-		}
-	}, [router, lottery, web3, accountId, managerId])
 
 	return {
 		open,
